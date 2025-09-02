@@ -3,5 +3,5 @@
 ## Team members
 - Sigurður Ari Stefánsson
 - Yi Hu
-- ...
+- Tryggvi Konráðsson
 - ...
