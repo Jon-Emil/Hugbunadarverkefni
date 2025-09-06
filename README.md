@@ -4,4 +4,4 @@
 - Sigurður Ari Stefánsson
 - Yi Hu
 - Tryggvi Konráðsson
-- ...
+- Jón Emil Rafnsson
