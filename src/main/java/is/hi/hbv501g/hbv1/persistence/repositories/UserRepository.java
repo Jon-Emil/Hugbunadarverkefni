@@ -1,0 +1,15 @@
+package is.hi.hbv501g.hbv1.persistence.repositories;
+
+import is.hi.hbv501g.hbv1.persistence.entities.Game;
+import is.hi.hbv501g.hbv1.persistence.entities.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    User save(User user);
+    List<User> findByUsername(String username);
+    User findById(long id);
+    List<User> findAll();
+    void delete(User user);
+}
