@@ -1,13 +1,12 @@
 package is.hi.hbv501g.hbv1.controllers;
 
-import is.hi.hbv501g.hbv1.api.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.PaginatedResponse;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class GameController {

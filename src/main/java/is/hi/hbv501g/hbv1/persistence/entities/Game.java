@@ -14,7 +14,7 @@ public class Game {
 
     private String title;
     private String description;
-    //private ArrayList<Genre> genre;
+    //private List<Genre> genre;
     private String release_date;
     private float price;
     private String cover_image;
