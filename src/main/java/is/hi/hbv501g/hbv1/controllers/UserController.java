@@ -1,6 +1,6 @@
 package is.hi.hbv501g.hbv1.controllers;
 
-import is.hi.hbv501g.hbv1.api.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.PaginatedResponse;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

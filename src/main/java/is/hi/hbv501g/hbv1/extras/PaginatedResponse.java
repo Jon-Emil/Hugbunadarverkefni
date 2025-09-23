@@ -1,4 +1,4 @@
-package is.hi.hbv501g.hbv1.api;
+package is.hi.hbv501g.hbv1.extras;
 
 import java.util.List;
 
