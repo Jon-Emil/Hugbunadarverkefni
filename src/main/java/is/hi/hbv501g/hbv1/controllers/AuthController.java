@@ -25,13 +25,18 @@ public class AuthController {
 
     @RequestMapping(value="/login", method=RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody Credentials credentials) {
+        if (credentials.getEmail() == null || credentials.getPassword() == null) {
+            // incorrect password so return a 401 error
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+
         User user = authService.findByEmail(credentials.getEmail());
         if (user == null) {
             // if no user then return a 404 error
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        if (jwtHelper.check(credentials.getPassword(), user.getPasswordHash())) {
+        if (!jwtHelper.check(credentials.getPassword(), user.getPasswordHash())) {
             // incorrect password so return a 401 error
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
