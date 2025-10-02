@@ -10,16 +10,19 @@ import java.util.List;
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String title;
     private String description;
     //private List<Genre> genre;
     private String release_date;
     private float price;
-    private String cover_image;
+    private String cover_image_URL;
     private String developer;
     private String publisher;
+    
+    @ManyToMany(mappedBy = "favorites")
+    private List<User> favorite_of = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();

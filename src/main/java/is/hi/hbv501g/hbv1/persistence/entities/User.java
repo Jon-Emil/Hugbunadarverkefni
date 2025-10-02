@@ -30,9 +30,12 @@ public class User {
     @JoinTable(
         name = "user_favorites",
         joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "game_id")
+        inverseJoinColumns = @JoinColumn(name = "game_id"),
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {"user_id", "game_id"})
+        }
     )
-    private List<Game>favorites;
+    private List<Game>favorites = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
