@@ -36,12 +36,12 @@ public class Game {
         this.description = description;
         this.release_date = release_date;
         this.price = price;
-        this.cover_image = cover_image;
+        this.cover_image_URL = cover_image;
         this.developer = developer;
         this.publisher = publisher;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -82,11 +82,11 @@ public class Game {
     }
 
     public String getCover_image() {
-        return cover_image;
+        return cover_image_URL;
     }
 
     public void setCover_image(String cover_image) {
-        this.cover_image = cover_image;
+        this.cover_image_URL = cover_image;
     }
 
     public String getDeveloper() {
@@ -103,5 +103,21 @@ public class Game {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public List<User> getFavorite_of() {
+        return favorite_of;
+    }
+
+    public void setFavorite_of(List<User> favorite_of) {
+        this.favorite_of = favorite_of;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }
