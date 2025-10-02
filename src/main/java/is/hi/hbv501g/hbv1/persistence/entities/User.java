@@ -23,7 +23,7 @@ public class User {
     private List<Game>hasPlayed;
     /*private List<Review> reviews;*/
     private String description;
-    private ImageIO profilePictture;
+    private String profilePicttureURL;
     private Role role;
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)
@@ -32,7 +32,7 @@ public class User {
     public User() {
     }
 
-    public User(String email, String username, String passwordHash) {
+    public User(String email, String username, String passwordHash, List<User> follows, List<User>followedBy, List<Game>favorites, List<Game>wantsToPlay, List<Game>hasPlayed, String description, String profilePicttureURL, Role role) {
         this.email = email;
         this.username = username;
         this.passwordHash = passwordHash;
