@@ -2,7 +2,6 @@ package is.hi.hbv501g.hbv1.persistence.repositories;
 
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
