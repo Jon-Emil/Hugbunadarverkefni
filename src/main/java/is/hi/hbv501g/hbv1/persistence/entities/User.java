@@ -36,14 +36,29 @@ public class User {
         this.email = email;
         this.username = username;
         this.passwordHash = passwordHash;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.follows = follows;
+        this.followedBy = followedBy;
+        this.favorites = favorites;
+        this.wantsToPlay = wantsToPlay;
+        this.hasPlayed = hasPlayed;
+        this.description = description;
+        this.profilePicttureURL = profilePicttureURL;
+        this.role = role;
     }
 
     public Long getId() {
         return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUsername() {
@@ -62,11 +77,68 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public String getEmail() {
-        return email;
+    public List<User> getFollows() {
+        return follows;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setFollows(List<User> follows) {
+        this.follows = follows;
     }
+
+    public List<User> getFollowedBy() {
+        return followedBy;
+    }
+
+    public void setFollowedBy(List<User> followedBy) {
+        this.followedBy = followedBy;
+    }
+
+    public List<Game> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(List<Game> favorites) {
+        this.favorites = favorites;
+    }
+
+    public List<Game> getWantsToPlay() {
+        return wantsToPlay;
+    }
+
+    public void setWantsToPlay(List<Game> wantsToPlay) {
+        this.wantsToPlay = wantsToPlay;
+    }
+
+    public List<Game> getHasPlayed() {
+        return hasPlayed;
+    }
+
+    public void setHasPlayed(List<Game> hasPlayed) {
+        this.hasPlayed = hasPlayed;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getProfilePicttureURL() {
+        return profilePicttureURL;
+    }
+
+    public void setProfilePicttureURL(String profilePicttureURL) {
+        this.profilePicttureURL = profilePicttureURL;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
 }
