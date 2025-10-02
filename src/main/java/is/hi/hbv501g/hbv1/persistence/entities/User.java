@@ -3,7 +3,6 @@ package is.hi.hbv501g.hbv1.persistence.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 
 @Entity
@@ -12,16 +11,45 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String email;
     private String username;
     private String passwordHash;
-    private List<User>follows;
-    private List<User>followedBy;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_follows",
+        joinColumns = @JoinColumn(name = "follower_id"),     // the followers of the user
+        inverseJoinColumns = @JoinColumn(name = "followed_id") // the users followed by the user
+    )
+    private List<User>follows = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "follows")
+    private List<User> followedBy = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_favorites",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "game_id")
+    )
     private List<Game>favorites;
-    private List<Game>wantsToPlay;
-    private List<Game>hasPlayed;
-    /*private List<Review> reviews;*/
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_wants_to_play",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "game_id")
+    )
+    private List<Game> wantsToPlay = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_has_played",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "game_id")
+    )
+    private List<Game> hasPlayed = new ArrayList<>();
+
     private String description;
     private String profilePicttureURL;
     private Role role;
