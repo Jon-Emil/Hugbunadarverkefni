@@ -35,3 +35,4 @@ build/
 
 # Properties
 src/main/resources/application.properties
+src/main/java/is/hi/hbv501g/hbv1/resources/application.properties
