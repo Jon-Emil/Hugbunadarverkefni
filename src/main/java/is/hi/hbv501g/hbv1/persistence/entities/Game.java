@@ -14,12 +14,19 @@ public class Game {
 
     private String title;
     private String description;
-    //private List<Genre> genre;
-    private String release_date;
+    private String releaseDate;
     private float price;
-    private String cover_image;
+    private String coverImage;
     private String developer;
     private String publisher;
+
+    @ManyToMany
+    @JoinTable(
+            name = "game_genre",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private List<Genre> genres;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -28,12 +35,12 @@ public class Game {
     public Game() {
     }
 
-    public Game(String title, String description, String release_date, float price, String cover_image, String developer, String publisher) {
+    public Game(String title, String description, String releaseDate, float price, String coverImage, String developer, String publisher) {
         this.title = title;
         this.description = description;
-        this.release_date = release_date;
+        this.releaseDate = releaseDate;
         this.price = price;
-        this.cover_image = cover_image;
+        this.coverImage = coverImage;
         this.developer = developer;
         this.publisher = publisher;
     }
@@ -63,11 +70,11 @@ public class Game {
     }
 
     public String getRelease_date() {
-        return release_date;
+        return releaseDate;
     }
 
-    public void setRelease_date(String release_date) {
-        this.release_date = release_date;
+    public void setRelease_date(String releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     public float getPrice() {
@@ -79,11 +86,11 @@ public class Game {
     }
 
     public String getCover_image() {
-        return cover_image;
+        return coverImage;
     }
 
-    public void setCover_image(String cover_image) {
-        this.cover_image = cover_image;
+    public void setCover_image(String coverImage) {
+        this.coverImage = coverImage;
     }
 
     public String getDeveloper() {

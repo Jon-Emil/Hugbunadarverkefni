@@ -13,7 +13,9 @@ public class Genre {
 
     private String title;
     private String description;
-    //private List<Game> games;
+
+    @ManyToMany(mappedBy = "genres")
+    private List<Game> games;
 
     public Genre() {
     }
@@ -39,7 +41,7 @@ public class Genre {
     public void setDescription(String description) {
         this.description = description;
     }
-    /*
+
     public List<Game> getGames() {
         return games;
     }
@@ -47,5 +49,4 @@ public class Genre {
     public void setGames(List<Game> games) {
         this.games = games;
     }
-    */
 }

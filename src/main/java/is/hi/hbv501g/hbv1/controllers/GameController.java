@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import is.hi.hbv501g.hbv1.extras.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,26 @@ public class GameController {
             @RequestBody Game game
     ) {
         return gameService.save(game);
+    }
+
+    @RequestMapping(value = "/games/search", method = RequestMethod.GET)
+    public PaginatedResponse<Game> gameSearch(
+            @RequestParam(defaultValue = "1") int pageNr,
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) String releasedAfter,
+            @RequestParam(required = false) String releasedBefore,
+            @RequestParam(required = false) String developer,
+            @RequestParam(required = false) String publisher,
+            @RequestParam(required = false) List<String> genres
+            ) {
+        SearchCriteria params = new SearchCriteria(
+                title, minPrice, maxPrice, releasedAfter, releasedBefore, developer, publisher, genres
+        );
+        List<Game> foundGames = gameService.search(params);
+        return new PaginatedResponse<Game>(200, foundGames, pageNr,perPage);
     }
 
 
