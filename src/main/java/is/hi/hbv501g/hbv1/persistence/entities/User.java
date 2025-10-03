@@ -16,14 +16,14 @@ public class User {
     private String email;
     private String username;
     private String passwordHash;
-    private List<User>follows;
-    private List<User>followedBy;
-    private List<Game>favorites;
-    private List<Game>wantsToPlay;
-    private List<Game>hasPlayed;
-    /*private List<Review> reviews;*/
+    //private List<User>follows;
+    //private List<User>followedBy;
+    //private List<Game>favorites;
+    //private List<Game>wantsToPlay;
+    //private List<Game>hasPlayed;
+    //private List<Review> reviews;
     private String description;
-    private ImageIO profilePictture;
+    //private ImageIO profilePicture;
     private Role role;
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)
