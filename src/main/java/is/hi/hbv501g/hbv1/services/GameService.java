@@ -1,5 +1,6 @@
 package is.hi.hbv501g.hbv1.services;
 
+import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 
 import java.util.List;
@@ -11,5 +12,6 @@ public interface GameService {
     Game save(Game game);
     void delete(Game game);
 
+    List<Game> search(SearchCriteria params);
     //more to be implemented as we go on.
 }
