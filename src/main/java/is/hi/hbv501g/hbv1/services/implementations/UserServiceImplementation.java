@@ -1,6 +1,5 @@
 package is.hi.hbv501g.hbv1.services.implementations;
 
-import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.persistence.repositories.UserRepository;
 import is.hi.hbv501g.hbv1.services.UserService;

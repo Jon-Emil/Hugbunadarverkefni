@@ -19,9 +19,8 @@ public class User {
     //private List<Game>favorites;
     //private List<Game>wantsToPlay;
     //private List<Game>hasPlayed;
-    /*private List<Review> reviews;*/
-    private String description;
     private String profilePictureURL;
+    private String description;
     private Role role;
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)

@@ -8,17 +8,15 @@ import java.util.List;
 
 public class SearchCriteria {
     private String title;
-    private float minPrice;
-    private float maxPrice;
+    private Float minPrice;
+    private Float maxPrice;
     private String releaseDateFrom;
     private String releaseDateTo;
     private String developer;
     private String publisher;
+    private List<String> genres;
 
-    // we need to implement Genre Constructor, GETTERs and SETTERs will be semi implemented meanwhile
-    // private genres List<Genre>;
-
-    public SearchCriteria(String title, float minPrice, float maxPrice, String releaseDateFrom, String releaseDateTo, String developer, String publisher) {
+    public SearchCriteria(String title, Float minPrice, Float maxPrice, String releaseDateFrom, String releaseDateTo, String developer, String publisher, List<String> genres) {
         this.title = title;
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
@@ -26,6 +24,7 @@ public class SearchCriteria {
         this.releaseDateTo = releaseDateTo;
         this.developer = developer;
         this.publisher = publisher;
+        this.genres = genres;
     }
 
     public String getTitle() {
@@ -36,19 +35,19 @@ public class SearchCriteria {
         this.title = title;
     }
 
-    public float getMinPrice() {
+    public Float getMinPrice() {
         return minPrice;
     }
 
-    public void setMinPrice(float minPrice) {
+    public void setMinPrice(Float minPrice) {
         this.minPrice = minPrice;
     }
 
-    public float getMaxPrice() {
+    public Float getMaxPrice() {
         return maxPrice;
     }
 
-    public void setMaxPrice(float maxPrice) {
+    public void setMaxPrice(Float maxPrice) {
         this.maxPrice = maxPrice;
     }
 
@@ -82,5 +81,13 @@ public class SearchCriteria {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public List<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
     }
 }
