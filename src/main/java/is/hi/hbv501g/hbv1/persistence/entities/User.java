@@ -3,8 +3,6 @@ package is.hi.hbv501g.hbv1.persistence.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
-
 
 @Entity
 @Table (name = "users")
@@ -16,14 +14,14 @@ public class User {
     private String email;
     private String username;
     private String passwordHash;
-    private List<User>follows;
-    private List<User>followedBy;
-    private List<Game>favorites;
-    private List<Game>wantsToPlay;
-    private List<Game>hasPlayed;
+    //private List<User>follows;
+    //private List<User>followedBy;
+    //private List<Game>favorites;
+    //private List<Game>wantsToPlay;
+    //private List<Game>hasPlayed;
     /*private List<Review> reviews;*/
     private String description;
-    private ImageIO profilePictture;
+    private String profilePictureURL;
     private Role role;
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)
@@ -36,6 +34,7 @@ public class User {
         this.email = email;
         this.username = username;
         this.passwordHash = passwordHash;
+        this.role = Role.USER;
     }
 
     public void setId(Long id) {
@@ -68,5 +67,9 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
     }
 }
