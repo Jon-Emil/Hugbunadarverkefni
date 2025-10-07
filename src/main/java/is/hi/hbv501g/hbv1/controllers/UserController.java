@@ -8,12 +8,11 @@ import is.hi.hbv501g.hbv1.persistence.repositories.GameRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.UserRepository;
 import is.hi.hbv501g.hbv1.services.UserService;
-
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,10 +41,10 @@ public class UserController {
             @RequestBody Review incomingReview) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId));
+        
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new ResourceNotFoundException("Game not found: " + gameId));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found: " + gameId));
 
         Review review = new Review();
         review.setRating(incomingReview.getRating());
