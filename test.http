@@ -8,9 +8,6 @@ Content-Type: application/json
   "password": "mypassword"
 }
 
-
-
-
 ###
 # 2) Log in as Alice (alias = login-alice)
 ### login-alice
@@ -22,11 +19,49 @@ Content-Type: application/json
   "password": "mypassword"
 }
 
-
-
-
 ###
 # 3) Delete Alice’s Account
 ### delete-alice
 DELETE http://localhost:8080/auth/delete
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzU5OTE5OTAzLCJleHAiOjE3NTk5NDE1MDN9.f-h45GPKEK8anUbGRh8I11cGYJHYU-gmxCJKAfukmH0
+
+
+//////////////////////////////////////
+
+
+### register-user
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "email":    "reviewer@example.com",
+  "username": "reviewer",
+  "password": "secret123"
+}
+
+###
+
+### create-game
+POST http://localhost:8080/games
+Content-Type: application/json
+
+{
+  "title": "The Legend of Testing",
+  "genre": "Adventure",
+  "description": "An epic testing journey 2"
+}
+
+###
+
+### post-review
+POST http://localhost:8080/1/games/1/reviews
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "title":  "Amazing Test Game",
+  "text":   "This game made me love testing!"
+}
+
+
+//////////////////////
