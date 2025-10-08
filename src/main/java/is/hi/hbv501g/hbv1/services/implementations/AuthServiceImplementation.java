@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthServiceImplementation implements AuthService {
@@ -26,4 +27,13 @@ public class AuthServiceImplementation implements AuthService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        userRepository.delete(user);
+    }
+
 }

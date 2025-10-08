@@ -1,9 +1,32 @@
-### Register a new user
+### register
 POST http://localhost:8080/register
 Content-Type: application/json
 
 {
-  "email":    "test@test.com",
-  "username": "test",
-  "password": "test"
+  "email":    "alice@example.com",
+  "username": "alice",
+  "password": "mypassword"
 }
+
+
+
+
+###
+# 2) Log in as Alice (alias = login-alice)
+### login-alice
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "email":    "alice@example.com",
+  "password": "mypassword"
+}
+
+
+
+
+###
+# 3) Delete Alice’s Account
+### delete-alice
+DELETE http://localhost:8080/auth/delete
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzU5OTE5OTAzLCJleHAiOjE3NTk5NDE1MDN9.f-h45GPKEK8anUbGRh8I11cGYJHYU-gmxCJKAfukmH0
