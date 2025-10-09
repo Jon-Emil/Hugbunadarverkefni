@@ -3,6 +3,7 @@ package is.hi.hbv501g.hbv1.controllers;
 import is.hi.hbv501g.hbv1.extras.Credentials;
 import is.hi.hbv501g.hbv1.extras.JWTHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
+import is.hi.hbv501g.hbv1.persistence.repositories.UserRepository;
 import is.hi.hbv501g.hbv1.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AuthController {
+
+    private final UserRepository userRepository;
     private final AuthService authService;
     private final JWTHelper jwtHelper;
 
@@ -18,9 +21,10 @@ public class AuthController {
     public AuthController(
             AuthService authService,
             JWTHelper jwtHelper
-    ) {
+    , UserRepository userRepository) {
         this.authService = authService;
         this.jwtHelper = jwtHelper;
+        this.userRepository = userRepository;
     }
 
     @RequestMapping(value="/login", method=RequestMethod.POST)
@@ -64,5 +68,37 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header("Authorization", "Bearer " + token)
                 .body(token);
+    }
+
+
+    @DeleteMapping("/auth/delete")
+    public ResponseEntity<?> deleteAccount(
+            @RequestHeader(name = "Authorization", required = false) String authHeader
+    ) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
+        Long userId;
+        try {
+            userId = jwtHelper.extractUserId(token);
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("Invalid or expired token");
+        }
+
+        try {
+            authService.deleteUserById(userId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("User not found");
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }
