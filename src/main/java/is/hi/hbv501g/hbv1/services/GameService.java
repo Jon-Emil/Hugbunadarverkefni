@@ -13,5 +13,6 @@ public interface GameService {
     void delete(Game game);
 
     List<Game> search(SearchCriteria params);
+    Game add(Game game, List<Long> genreIds);
     //more to be implemented as we go on.
 }

@@ -12,12 +12,18 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(length = 128)
     private String title;
+    @Column(length = 1024)
     private String description;
+    @Column(length = 16)
     private String releaseDate;
     private float price;
+    @Column(length = 512)
     private String coverImage;
+    @Column(length = 64)
     private String developer;
+    @Column(length = 64)
     private String publisher;
 
     @ManyToMany
@@ -26,7 +32,7 @@ public class Game {
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    private List<Genre> genres;
+    private List<Genre> genres  = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -69,11 +75,11 @@ public class Game {
         this.description = description;
     }
 
-    public String getRelease_date() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setRelease_date(String releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -85,11 +91,11 @@ public class Game {
         this.price = price;
     }
 
-    public String getCover_image() {
+    public String getCoverimage() {
         return coverImage;
     }
 
-    public void setCover_image(String coverImage) {
+    public void setCoverimage(String coverImage) {
         this.coverImage = coverImage;
     }
 
@@ -107,5 +113,12 @@ public class Game {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
     }
 }

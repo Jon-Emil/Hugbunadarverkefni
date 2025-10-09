@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface AuthService {
     User findByEmail(String email);
+    User findById(Long id);
     User save(User user);
 }

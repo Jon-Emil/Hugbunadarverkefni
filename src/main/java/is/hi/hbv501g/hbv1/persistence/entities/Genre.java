@@ -1,5 +1,8 @@
 package is.hi.hbv501g.hbv1.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,19 +14,20 @@ public class Genre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(unique = true)
     private String title;
     private String description;
 
     @ManyToMany(mappedBy = "genres")
-    private List<Game> games;
+    @JsonBackReference
+    private List<Game> games  = new ArrayList<>();
 
     public Genre() {
     }
 
-    public Genre(String title, String description/*, List<Game> games */) {
+    public Genre(String title, String description) {
         this.title = title;
         this.description = description;
-        //this.games = games;
     }
 
     public String getTitle() {
