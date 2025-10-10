@@ -1,6 +1,8 @@
 package is.hi.hbv501g.hbv1.controllers;
 
+import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.CloudinaryService;
+import is.hi.hbv501g.hbv1.extras.GameToCreate;
 import is.hi.hbv501g.hbv1.extras.JWTHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
@@ -9,10 +11,12 @@ import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.AuthService;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.GenreService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,39 +44,49 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/addGame", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> addGame(
-            //@RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("releaseDate") String releaseDate,
-            @RequestParam("price") Float price,
-            @RequestParam("developer") String developer,
-            @RequestParam("publisher") String publisher,
-            @RequestParam("genres") String genreIdsString,
-            @RequestParam("coverImage") MultipartFile coverImageFile
-    ) {
-        /*
-        //Extract current user from Auth token
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtHelper.extractUserId(token);
-        User user = authService.findById(userId);
+            @RequestHeader(value = "Authorization") String authHeader,
+            @Valid @RequestPart("game") GameToCreate gameToCreate,
+            BindingResult res,
+            @RequestPart("coverImage") MultipartFile coverImageFile
+            ) {
 
-        //Verify user is ADMIN
-        if (user == null || user.getRole() != Role.ADMIN) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You must be an admin to add a game");
+        try {
+            //Extract current user from Auth token
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            User user = authService.findById(userId);
+
+            //Verify user is ADMIN
+            if (user == null || user.getRole() != Role.ADMIN) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("You must be an admin to add a game");
+            }
+        }catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
         }
-         */
 
-        //Need to check image type HERE and validate data
+        //Check validation of Game details
+        if (res.hasErrors()) {
+            String errors = res.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(","));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
+        //Need to check image type HERE
         String cloudinaryUrl = cloudinaryService.uploadGameImage(coverImageFile);
 
-        List<Long> genreIds = Arrays.stream(genreIdsString.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
 
-
-        Game game = new Game(title, description, releaseDate, price, cloudinaryUrl, developer, publisher);
-        gameService.add(game, genreIds);
+        Game game = new Game(
+                gameToCreate.getTitle(),
+                gameToCreate.getDescription(),
+                gameToCreate.getReleaseDate(),
+                gameToCreate.getPrice(),
+                cloudinaryUrl,
+                gameToCreate.getPublisher(),
+                gameToCreate.getDeveloper()
+                );
+        gameService.add(game, gameToCreate.getGenreIds());
 
         return ResponseEntity.ok("Game added!");
     }
