@@ -4,6 +4,7 @@ import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.persistence.repositories.GameRepository;
+import is.hi.hbv501g.hbv1.persistence.repositories.GenreRepository;
 import is.hi.hbv501g.hbv1.services.GameService;
 import jakarta.persistence.criteria.Join;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,12 @@ import java.util.List;
 @Service
 public class GameServiceImplementation implements GameService {
     private GameRepository gameRepository;
+    private GenreRepository genreRepository;
 
     @Autowired
-    public GameServiceImplementation(GameRepository gameRepository) {
+    public GameServiceImplementation(GameRepository gameRepository,  GenreRepository genreRepository) {
         this.gameRepository = gameRepository;
+        this.genreRepository = genreRepository;
     }
 
 
@@ -102,5 +105,12 @@ public class GameServiceImplementation implements GameService {
         }
 
         return gameRepository.findAll(spec);
+    }
+
+    @Override
+    public Game add(Game game, List<Long> genreIds) {
+        List<Genre> genres = genreRepository.findAllById(genreIds);
+        game.setGenres(genres);
+        return gameRepository.save(game);
     }
 }

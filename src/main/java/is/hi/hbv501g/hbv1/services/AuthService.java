@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface AuthService {
     User findByEmail(String email);
+    User findById(Long id);
     User save(User user);
     void deleteUserById(Long id);
 }

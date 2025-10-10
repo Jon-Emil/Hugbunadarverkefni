@@ -31,14 +31,6 @@ public class GameController {
         return new PaginatedResponse<Game>(200, allGames, pageNr,perPage);
     }
 
-
-    @RequestMapping(value = "/games", method = RequestMethod.POST)
-    public Game addGame(
-            @RequestBody Game game
-    ) {
-        return gameService.save(game);
-    }
-
     @RequestMapping(value = "/games/search", method = RequestMethod.GET)
     public PaginatedResponse<Game> gameSearch(
             @RequestParam(defaultValue = "1") int pageNr,
