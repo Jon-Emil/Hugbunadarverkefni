@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -101,6 +102,12 @@ public class GameController {
 
         Game game = gameService.findById(gameID);
 
+        Optional<Review> existingReview = gameService.findReview(game, user);
+
+        if (existingReview.isPresent()) {
+            return ResponseEntity.badRequest().body("Review already exists");
+        }
+
         Review review = new Review();
         review.setRating(incomingReview.getRating());
         review.setTitle(incomingReview.getTitle());
@@ -111,4 +118,5 @@ public class GameController {
         gameService.saveReview(review);
         return ResponseEntity.ok("review added to " + game.getTitle());
     }
+
 }

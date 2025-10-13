@@ -70,7 +70,7 @@ public class AuthController {
                 .body(token);
     }
 
-
+    /*
     @DeleteMapping("/auth/delete")
     public ResponseEntity<?> deleteAccount(
             @RequestHeader(name = "Authorization", required = false) String authHeader
@@ -101,4 +101,5 @@ public class AuthController {
 
         return ResponseEntity.noContent().build();
     }
+    */
 }
