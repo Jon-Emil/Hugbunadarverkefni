@@ -3,8 +3,10 @@ package is.hi.hbv501g.hbv1.services.implementations;
 import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
+import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.repositories.GameRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.GenreRepository;
+import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
 import is.hi.hbv501g.hbv1.services.GameService;
 import jakarta.persistence.criteria.Join;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +17,19 @@ import java.util.List;
 
 @Service
 public class GameServiceImplementation implements GameService {
-    private GameRepository gameRepository;
-    private GenreRepository genreRepository;
+    private final GameRepository gameRepository;
+    private final GenreRepository genreRepository;
+    private final ReviewRepository reviewRepository;
 
     @Autowired
-    public GameServiceImplementation(GameRepository gameRepository,  GenreRepository genreRepository) {
+    public GameServiceImplementation(
+            GameRepository gameRepository,
+            GenreRepository genreRepository,
+            ReviewRepository reviewRepository
+    ) {
         this.gameRepository = gameRepository;
         this.genreRepository = genreRepository;
+        this.reviewRepository = reviewRepository;
     }
 
 
@@ -112,5 +120,10 @@ public class GameServiceImplementation implements GameService {
         List<Genre> genres = genreRepository.findAllById(genreIds);
         game.setGenres(genres);
         return gameRepository.save(game);
+    }
+
+    @Override
+    public Review saveReview(Review review) {
+        return reviewRepository.save(review);
     }
 }
