@@ -68,7 +68,7 @@ public class AdminController {
         //Check validation of Game details
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
-                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(","));
+                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
             return ResponseEntity.badRequest().body(errors);
         }
 

@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.persistence.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "reviews")
@@ -9,11 +10,19 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Review must have a rating")
+    @Min(value = 0, message = "Rating must be at least 0")
+    @Max(value = 100, message = "Rating must be at most 100")
     private int rating;
 
-     @Column(columnDefinition = "TEXT")
+    @Column(length = 512)
+    @NotBlank(message = "Review must have a main text")
+    @Size (min = 2, max = 512, message = "Main text must be between 2 and 512 characters")
     private String text;
 
+    @Column(length = 64)
+    @NotBlank(message = "Review must have a title")
+    @Size (min = 2, max = 64, message = "Title must be between 2 and 64 characters")
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)

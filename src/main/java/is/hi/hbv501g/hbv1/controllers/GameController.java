@@ -14,10 +14,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class GameController {
@@ -73,7 +75,8 @@ public class GameController {
     public ResponseEntity<String> postReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
-            @RequestBody Review incomingReview
+            @Valid @RequestBody Review incomingReview,
+            BindingResult res
     ) {
         User user;
         try {
@@ -88,6 +91,12 @@ public class GameController {
             }
         }catch (JwtException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
+
+        if (res.hasErrors()) {
+            String errors = res.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
         }
 
         Game game = gameService.findById(gameID);
