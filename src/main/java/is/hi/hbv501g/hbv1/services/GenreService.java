@@ -9,4 +9,5 @@ public interface GenreService {
     Genre save(Genre game);
     void delete(Genre game);
 
+    List<Genre> getGenresByIds(List<Long> genreIds);
 }

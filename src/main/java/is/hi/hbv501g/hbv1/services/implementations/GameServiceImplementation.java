@@ -4,6 +4,7 @@ import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
+import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.persistence.repositories.GameRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.GenreRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GameServiceImplementation implements GameService {
@@ -125,5 +127,10 @@ public class GameServiceImplementation implements GameService {
     @Override
     public Review saveReview(Review review) {
         return reviewRepository.save(review);
+    }
+
+    @Override
+    public Optional<Review> findReview(Game game, User user) {
+        return reviewRepository.findByGameAndUser(game, user);
     }
 }

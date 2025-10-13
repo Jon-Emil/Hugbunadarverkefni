@@ -40,6 +40,15 @@ public class User {
         this.role = Role.USER;
     }
 
+    public User(String email, String username, String passwordHash, String description, String profilePictureURL) {
+        this.email = email;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.description = description;
+        this.profilePictureURL = profilePictureURL;
+        this.role = Role.USER;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -82,5 +91,21 @@ public class User {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public void setProfilePictureURL(String profilePictureURL) {
+        this.profilePictureURL = profilePictureURL;
     }
 }
