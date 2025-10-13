@@ -1,5 +1,8 @@
 package is.hi.hbv501g.hbv1.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,8 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Review> reviews = new ArrayList<>();
+    @JsonIgnoreProperties({"game", "user"})
+    private List<Review> reviews = new ArrayList<>();
 
     public User() {
     }
@@ -70,5 +74,13 @@ public class User {
 
     public Role getRole() {
         return role;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

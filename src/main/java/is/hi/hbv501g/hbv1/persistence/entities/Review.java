@@ -1,5 +1,7 @@
 package is.hi.hbv501g.hbv1.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,10 +18,14 @@ public class Review {
 
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "user-id")
+    @JsonIgnore
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "game-id")
+    @JsonIgnore
     private Game game;
 
     public Review() {
@@ -33,6 +39,16 @@ public class Review {
         this.rating = rating;
     }
 
+    @Transient
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
+
+    @Transient
+    public Long getGameId() {
+        return game != null ? game.getId() : null;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -41,7 +57,7 @@ public class Review {
         return id;
     }
 
-     //get rating 
+     //get rating
     public int getRating() {
         return rating;
     }

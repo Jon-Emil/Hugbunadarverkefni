@@ -1,5 +1,7 @@
 package is.hi.hbv501g.hbv1.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -36,6 +38,7 @@ public class Game {
     private List<Genre> genres  = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"game", "user"})
     private List<Review> reviews = new ArrayList<>();
 
 
@@ -121,5 +124,21 @@ public class Game {
     }
     public void setGenres(List<Genre> genres) {
         this.genres = genres;
+    }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(String coverImage) {
+        this.coverImage = coverImage;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }
