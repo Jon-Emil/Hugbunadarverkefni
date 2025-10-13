@@ -1,21 +1,41 @@
 package is.hi.hbv501g.hbv1.controllers;
 
+import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
+import is.hi.hbv501g.hbv1.persistence.entities.Review;
+import is.hi.hbv501g.hbv1.persistence.entities.Role;
+import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
+import is.hi.hbv501g.hbv1.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class GameController {
     private final GameService gameService;
+    private final UserService userService;
+    private final JWTHelper jwtHelper;
 
     @Autowired
-    public GameController(GameService gameService) {
+    public GameController(
+            GameService gameService,
+            UserService userService,
+            JWTHelper jwtHelper
+    ) {
         this.gameService = gameService;
+        this.userService = userService;
+        this.jwtHelper = jwtHelper;
     }
 
     @RequestMapping(value = "/games", method = RequestMethod.GET)
@@ -51,5 +71,44 @@ public class GameController {
         return new PaginatedResponse<Game>(200, foundGames, pageNr,perPage);
     }
 
+    @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
+    public ResponseEntity<String> postReview(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable Long gameID,
+            @Valid @RequestBody Review incomingReview,
+            BindingResult res
+    ) {
+        User user;
+        try {
+            //Extract current user from Auth token
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            user = userService.findById(userId);
 
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("You must be logged in to add a review");
+            }
+        }catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
+
+        if (res.hasErrors()) {
+            String errors = res.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        Game game = gameService.findById(gameID);
+
+        Review review = new Review();
+        review.setRating(incomingReview.getRating());
+        review.setTitle(incomingReview.getTitle());
+        review.setText(incomingReview.getText());
+        review.setUser(user);
+        review.setGame(game);
+
+        gameService.saveReview(review);
+        return ResponseEntity.ok("review added to " + game.getTitle());
+    }
 }
