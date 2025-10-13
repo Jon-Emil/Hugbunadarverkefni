@@ -7,6 +7,7 @@ import is.hi.hbv501g.hbv1.extras.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.entities.Role;
+import java.util.Map;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.UserService;
@@ -117,6 +118,63 @@ public class GameController {
 
         gameService.saveReview(review);
         return ResponseEntity.ok("review added to " + game.getTitle());
+    }
+
+    @RequestMapping(value = "/games/{gameID}/favorite", method = RequestMethod.POST)
+    public ResponseEntity<?> toggleFavorite(
+            @PathVariable("gameID") Long gameId,
+            @RequestHeader(value = "Authorization") String authHeader
+    ) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            boolean nowFavorited = userService.toggleFavorite(userId, gameId);
+            return ResponseEntity.ok().body(
+                    Map.of("gameId", gameId, "favorited", nowFavorited)
+            );
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Toggle favorite failed.");
+        }
+    }
+
+    @RequestMapping(value = "/games/{gameID}/want", method = RequestMethod.POST)
+    public ResponseEntity<?> toggleWantToPlay(
+            @PathVariable("gameID") Long gameId,
+            @RequestHeader(value = "Authorization") String authHeader
+    ) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            boolean nowWanted = userService.toggleWantToPlay(userId, gameId);
+            return ResponseEntity.ok().body(
+                    Map.of("gameId", gameId, "wantToPlay", nowWanted)
+            );
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Toggle wantToPlay failed.");
+        }
+    }
+
+    @RequestMapping(value = "/games/{gameID}/played", method = RequestMethod.POST)
+    public ResponseEntity<?> toggleHasPlayed(
+            @PathVariable("gameID") Long gameId,
+            @RequestHeader(value = "Authorization") String authHeader
+    ) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            boolean nowPlayed = userService.toggleHasPlayed(userId, gameId);
+            return ResponseEntity.ok().body(
+                    Map.of("gameId", gameId, "hasPlayed", nowPlayed)
+            );
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Toggle hasPlayed failed.");
+        }
     }
 
 }

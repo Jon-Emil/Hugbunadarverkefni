@@ -10,4 +10,8 @@ public interface UserService {
     User findByUsername(String username);
     User save(User user);
     void delete(User user);
+    boolean toggleFavorite(Long userId, Long gameId);
+    boolean toggleWantToPlay(Long userId, Long gameId);
+    boolean toggleHasPlayed(Long userId, Long gameId);
+
 }
