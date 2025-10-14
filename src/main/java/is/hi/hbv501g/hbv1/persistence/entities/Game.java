@@ -41,6 +41,15 @@ public class Game {
     @JsonIgnoreProperties({"game", "user"})
     private List<Review> reviews = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "favorites")
+    private List<User> favoriteOf = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "wantsToPlay")
+    private List<User> wantToPlay = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "hasPlayed")
+    private List<User> havePlayed = new ArrayList<>();
+
 
     public Game() {
     }
@@ -140,5 +149,29 @@ public class Game {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public List<User> getFavoriteOf() {
+        return favoriteOf;
+    }
+
+    public void setFavoriteOf(List<User> favoriteOf) {
+        this.favoriteOf = favoriteOf;
+    }
+
+    public List<User> getWantToPlay() {
+        return wantToPlay;
+    }
+
+    public void setWantToPlay(List<User> wantToPlay) {
+        this.wantToPlay = wantToPlay;
+    }
+
+    public List<User> getHavePlayed() {
+        return havePlayed;
+    }
+
+    public void setHavePlayed(List<User> havePlayed) {
+        this.havePlayed = havePlayed;
     }
 }

@@ -10,8 +10,10 @@ import is.hi.hbv501g.hbv1.persistence.repositories.GenreRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
 import is.hi.hbv501g.hbv1.services.GameService;
 import jakarta.persistence.criteria.Join;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -124,13 +126,30 @@ public class GameServiceImplementation implements GameService {
         return gameRepository.save(game);
     }
 
+    /**
+     *
+     * @param user A user that exists in the system and who the review will be linked to
+     * @param game A game that exists in the system and what the review will be linked to
+     * @param incomingReview The rest of the information about the review
+     *
+     * @return The review that was added to the system
+     */
     @Override
-    public Review saveReview(Review review) {
-        return reviewRepository.save(review);
-    }
+    @Transactional
+    public Review postReview(User user, Game game, Review incomingReview) {
+        Optional<Review> existingReview = reviewRepository.findByGameAndUser(game, user);;
 
-    @Override
-    public Optional<Review> findReview(Game game, User user) {
-        return reviewRepository.findByGameAndUser(game, user);
+        if (existingReview.isPresent()) {
+            throw new IllegalArgumentException("Review already exists for this user and game");
+        }
+
+        Review review = new Review();
+        review.setRating(incomingReview.getRating());
+        review.setTitle(incomingReview.getTitle());
+        review.setText(incomingReview.getText());
+        review.setUser(user);
+        review.setGame(game);
+
+        return reviewRepository.save(review);
     }
 }
