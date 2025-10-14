@@ -1,16 +1,11 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
-import is.hi.hbv501g.hbv1.extras.CloudinaryService;
-import is.hi.hbv501g.hbv1.extras.JWTHelper;
-import is.hi.hbv501g.hbv1.extras.PaginatedResponse;
-import is.hi.hbv501g.hbv1.extras.UserToUpdate;
-import is.hi.hbv501g.hbv1.persistence.entities.Game;
-import is.hi.hbv501g.hbv1.persistence.entities.Review;
+import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
+import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
+import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.DTOs.UserToUpdate;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
-import is.hi.hbv501g.hbv1.persistence.repositories.GameRepository;
-import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
-import is.hi.hbv501g.hbv1.persistence.repositories.UserRepository;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;

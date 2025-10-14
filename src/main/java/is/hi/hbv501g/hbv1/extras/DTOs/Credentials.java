@@ -1,4 +1,4 @@
-package is.hi.hbv501g.hbv1.extras;
+package is.hi.hbv501g.hbv1.extras.DTOs;
 
 public class Credentials {
     private String email;

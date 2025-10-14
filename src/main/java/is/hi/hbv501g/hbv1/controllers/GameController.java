@@ -1,15 +1,14 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
-import is.hi.hbv501g.hbv1.extras.JWTHelper;
-import is.hi.hbv501g.hbv1.extras.PaginatedResponse;
-import is.hi.hbv501g.hbv1.extras.SearchCriteria;
+import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
+import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
-import is.hi.hbv501g.hbv1.persistence.entities.Role;
 
 import java.util.Comparator;
-import java.util.Map;
+
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.UserService;
@@ -19,10 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController

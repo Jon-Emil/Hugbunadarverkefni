@@ -18,6 +18,9 @@ public class User {
     private String email;
     private String username;
     private String passwordHash;
+    private String profilePictureURL;
+    private String description;
+    private Role role;
     //private List<User>follows;
     //private List<User>followedBy;
     @ManyToMany
@@ -43,10 +46,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "game_id")
     )
     private List<Game> hasPlayed = new ArrayList<>();
-
-    private String profilePictureURL;
-    private String description;
-    private Role role;
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"game", "user"})
