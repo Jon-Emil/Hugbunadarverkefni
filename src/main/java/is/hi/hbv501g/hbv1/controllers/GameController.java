@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
@@ -69,24 +70,28 @@ public class GameController {
      * and all available games sorted by their title alphabetically of the page requested
      */
     @RequestMapping(value = "/games", method = RequestMethod.GET)
-    public PaginatedResponse<Game> allGames(
+    public PaginatedResponse<NormalGameDTO> allGames(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage
     ) {
-        //Business logic
-        //Call a method in a service class
-        //Add some data to the model
-        // we only return data not HTML templates
+        // get all games
         List<Game> allGames = gameService.findAll();
+
+        // sort list
         allGames.sort(Comparator.comparing(Game::getTitle));
-        return new PaginatedResponse<Game>(200, allGames, pageNr,perPage);
+
+        // convert to DTOs
+        List<NormalGameDTO> allGameDTOs = allGames.stream()
+                .map(NormalGameDTO::new).toList();
+        return new PaginatedResponse<NormalGameDTO>(200, allGameDTOs, pageNr,perPage);
     }
 
     @RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET)
-    public Game gameDetails(
+    public NormalGameDTO gameDetails(
             @PathVariable("gameID") Long gameID
     ) {
-        return gameService.findById(gameID);
+        Game game = gameService.findById(gameID);
+        return new NormalGameDTO(game);
     }
 
     /**
@@ -107,7 +112,7 @@ public class GameController {
      * and all available games that fit the criteria in the page that was requested
      */
     @RequestMapping(value = "/games/search", method = RequestMethod.GET)
-    public PaginatedResponse<Game> gameSearch(
+    public PaginatedResponse<NormalGameDTO> gameSearch(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(required = false) String title,
@@ -123,7 +128,9 @@ public class GameController {
                 title, minPrice, maxPrice, releasedAfter, releasedBefore, developer, publisher, genres
         );
         List<Game> foundGames = gameService.search(params);
-        return new PaginatedResponse<Game>(200, foundGames, pageNr,perPage);
+        List<NormalGameDTO> allGameDTOs = foundGames.stream()
+                .map(NormalGameDTO::new).toList();
+        return new PaginatedResponse<NormalGameDTO>(200, allGameDTOs, pageNr,perPage);
     }
 
     /**

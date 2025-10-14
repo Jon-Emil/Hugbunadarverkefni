@@ -22,4 +22,20 @@ public class NormalGenreDTO {
         this.games = genre.getGames().stream()
                 .map(ReferencedGameDTO::new).toList();
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<ReferencedGameDTO> getGames() {
+        return games;
+    }
 }

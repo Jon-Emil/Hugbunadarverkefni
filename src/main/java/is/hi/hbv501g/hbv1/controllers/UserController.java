@@ -1,6 +1,8 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.user.NormalUserDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
@@ -33,16 +35,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public PaginatedResponse<User> allUsers(
+    public PaginatedResponse<NormalUserDTO> allUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage
     ) {
-        //Business logic
-        //Call a method in a service class
-        //Add some data to the model
-        // we only return data not HTML templates
         List<User> allUsers = userService.findAll();
-        return new PaginatedResponse<User>(200, allUsers, pageNr,perPage);
+        List<NormalUserDTO> allGameDTOs = allUsers.stream()
+                .map(NormalUserDTO::new).toList();
+        return new PaginatedResponse<NormalUserDTO>(200, allGameDTOs, pageNr,perPage);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.DELETE)

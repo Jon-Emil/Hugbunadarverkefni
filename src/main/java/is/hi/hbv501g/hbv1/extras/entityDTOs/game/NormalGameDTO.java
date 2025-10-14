@@ -50,4 +50,56 @@ public class NormalGameDTO {
         this.havePlayed = game.getHavePlayed().stream()
                 .map(ReferencedUserDTO::new).toList();
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public String getDeveloper() {
+        return developer;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public List<ReferencedGenreDTO> getGenres() {
+        return genres;
+    }
+
+    public List<ReferencedReviewDTO> getReviews() {
+        return reviews;
+    }
+
+    public List<ReferencedUserDTO> getFavoriteOf() {
+        return favoriteOf;
+    }
+
+    public List<ReferencedUserDTO> getWantToPlay() {
+        return wantToPlay;
+    }
+
+    public List<ReferencedUserDTO> getHavePlayed() {
+        return havePlayed;
+    }
 }

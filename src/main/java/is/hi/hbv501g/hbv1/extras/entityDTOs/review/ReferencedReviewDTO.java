@@ -29,4 +29,28 @@ public class ReferencedReviewDTO {
         this.user = new ReferencedUserDTO(review.getUser());
         this.game = new ReferencedGameDTO(review.getGame());
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public ReferencedUserDTO getUser() {
+        return user;
+    }
+
+    public ReferencedGameDTO getGame() {
+        return game;
+    }
 }

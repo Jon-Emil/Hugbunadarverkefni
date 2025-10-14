@@ -21,4 +21,32 @@ public class ReferencedUserDTO {
         this.description = user.getDescription();
         this.role = user.getRole();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public String getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Role getRole() {
+        return role;
+    }
 }

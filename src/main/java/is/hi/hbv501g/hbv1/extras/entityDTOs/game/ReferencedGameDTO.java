@@ -22,4 +22,36 @@ public class ReferencedGameDTO {
         this.developer = game.getDeveloper();
         this.publisher = game.getPublisher();
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public String getDeveloper() {
+        return developer;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
 }

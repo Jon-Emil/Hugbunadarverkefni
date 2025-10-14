@@ -19,4 +19,16 @@ public class ReferencedGenreDTO {
         this.title = genre.getTitle();
         this.description = genre.getDescription();
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

@@ -44,4 +44,48 @@ public class NormalUserDTO {
         this.reviews = user.getReviews().stream()
                 .map(ReferencedReviewDTO::new).toList();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public String getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public List<ReferencedGameDTO> getFavorites() {
+        return favorites;
+    }
+
+    public List<ReferencedGameDTO> getWantsToPlay() {
+        return wantsToPlay;
+    }
+
+    public List<ReferencedGameDTO> getHasPlayed() {
+        return hasPlayed;
+    }
+
+    public List<ReferencedReviewDTO> getReviews() {
+        return reviews;
+    }
 }

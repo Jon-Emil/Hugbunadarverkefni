@@ -14,4 +14,20 @@ public class NormalReviewDTO {
         this.text = review.getText();
         this.title = review.getTitle();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 }
