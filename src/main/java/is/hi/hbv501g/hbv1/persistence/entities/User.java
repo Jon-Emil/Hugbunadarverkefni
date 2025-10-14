@@ -48,7 +48,6 @@ public class User {
     private List<Game> hasPlayed = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"game", "user"})
     private List<Review> reviews = new ArrayList<>();
 
     public User() {

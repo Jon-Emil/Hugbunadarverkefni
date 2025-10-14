@@ -29,12 +29,10 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user-id")
-    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "game-id")
-    @JsonIgnore
     private Game game;
 
     public Review() {

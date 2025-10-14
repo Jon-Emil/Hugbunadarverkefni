@@ -19,7 +19,6 @@ public class Genre {
     private String description;
 
     @ManyToMany(mappedBy = "genres")
-    @JsonBackReference
     private List<Game> games  = new ArrayList<>();
 
     public Genre() {

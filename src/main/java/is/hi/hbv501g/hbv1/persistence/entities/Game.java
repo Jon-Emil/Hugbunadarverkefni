@@ -38,7 +38,6 @@ public class Game {
     private List<Genre> genres  = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"game", "user"})
     private List<Review> reviews = new ArrayList<>();
 
     @ManyToMany(mappedBy = "favorites")

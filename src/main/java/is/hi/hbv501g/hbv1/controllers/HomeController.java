@@ -18,6 +18,4 @@ public class HomeController {
         // we only return data not HTML templates
         return "home";
     }
-
-
 }
