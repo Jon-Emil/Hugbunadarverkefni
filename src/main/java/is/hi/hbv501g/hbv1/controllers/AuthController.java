@@ -1,7 +1,7 @@
 package is.hi.hbv501g.hbv1.controllers;
 
-import is.hi.hbv501g.hbv1.extras.Credentials;
-import is.hi.hbv501g.hbv1.extras.JWTHelper;
+import is.hi.hbv501g.hbv1.extras.DTOs.Credentials;
+import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.persistence.repositories.UserRepository;
 import is.hi.hbv501g.hbv1.services.AuthService;

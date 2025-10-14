@@ -1,12 +1,11 @@
 package is.hi.hbv501g.hbv1.services;
 
-import is.hi.hbv501g.hbv1.extras.SearchCriteria;
+import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface GameService {
     Game findById(Long id);
@@ -18,7 +17,5 @@ public interface GameService {
     List<Game> search(SearchCriteria params);
     Game add(Game game, List<Long> genreIds);
 
-    Review saveReview(Review review);
-    Optional<Review> findReview(Game game, User user);
-    //more to be implemented as we go on.
+    Review postReview(User user, Game game, Review incomingReview);
 }

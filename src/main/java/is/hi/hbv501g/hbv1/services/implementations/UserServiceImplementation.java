@@ -45,6 +45,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void delete(User user) { userRepository.delete(user); }
 
+    /*
     @Override
     @Transactional
     public boolean toggleFavorite(Long userId, Long gameId) {
@@ -62,6 +63,7 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
         return added; // true þýðir að leikurinn hefur verið officially favoritaður af aðferðinni, false þýðir að leikurinn hefur verið officially af-favoritaður af aðferðinni.
     }
+
 
     @Override
     @Transactional
@@ -98,5 +100,139 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
         return added; // skoða komment af toggleFav, sambærilegt.
     }
+    */
+
+    /**
+     * Adds a favorite connection between a game and a user if it does not exist already
+     *
+     * @param user the user in the connection
+     * @param game the game in the connection
+     *
+     * @throws IllegalArgumentException if the connection already exists
+     */
+    @Transactional
+    @Override
+    public void addFavorite(User user, Game game) {
+        if (user.getFavorites().contains(game)) {
+            throw new IllegalArgumentException("Connection already exists");
+        }
+
+        user.getFavorites().add(game);
+        game.getFavoriteOf().add(user);
+
+        userRepository.save(user);
+        gameRepository.save(game);
+    }
+
+    /**
+     * Removes the favorite connection between a game and a user
+     *
+     * @param user the user in the connection
+     * @param game the game in the connection
+     *
+     * @throws IllegalArgumentException if the connection does not exist
+     */
+    @Transactional
+    @Override
+    public void removeFavorite(User user, Game game) {
+        if (!user.getFavorites().contains(game)) {
+            throw new IllegalArgumentException("Connection does not exist");
+        }
+
+        user.getFavorites().remove(game);
+        game.getFavoriteOf().remove(user);
+
+        userRepository.save(user);
+        gameRepository.save(game);
+    }
+
+    /**
+     * Adds a want to play connection between a game and a user if it does not exist already
+     *
+     * @param user the user in the connection
+     * @param game the game in the connection
+     *
+     * @throws IllegalArgumentException if the connection already exists
+     */
+    @Transactional
+    @Override
+    public void addWantToPlay(User user, Game game) {
+        if (user.getWantsToPlay().contains(game)) {
+            throw new IllegalArgumentException("Connection already exists");
+        }
+
+        user.getWantsToPlay().add(game);
+        game.getWantToPlay().add(user);
+
+        userRepository.save(user);
+        gameRepository.save(game);
+    }
+
+    /**
+     * Removes the want to play connection between a game and a user
+     *
+     * @param user the user in the connection
+     * @param game the game in the connection
+     *
+     * @throws IllegalArgumentException if the connection does not exist
+     */
+    @Transactional
+    @Override
+    public void removeWantToPlay(User user, Game game) {
+        if (!user.getWantsToPlay().contains(game)) {
+            throw new IllegalArgumentException("Connection does not exist");
+        }
+
+        user.getWantsToPlay().remove(game);
+        game.getWantToPlay().remove(user);
+
+        userRepository.save(user);
+        gameRepository.save(game);
+    }
+
+    /**
+     * Adds a has played connection between a game and a user if it does not exist already
+     *
+     * @param user the user in the connection
+     * @param game the game in the connection
+     *
+     * @throws IllegalArgumentException if the connection already exists
+     */
+    @Transactional
+    @Override
+    public void addHasPlayed(User user, Game game) {
+        if (user.getHasPlayed().contains(game)) {
+            throw new IllegalArgumentException("Connection already exists");
+        }
+
+        user.getHasPlayed().add(game);
+        game.getHavePlayed().add(user);
+
+        userRepository.save(user);
+        gameRepository.save(game);
+    }
+
+    /**
+     * Removes the has played connection between a game and a user
+     *
+     * @param user the user in the connection
+     * @param game the game in the connection
+     *
+     * @throws IllegalArgumentException if the connection does not exist
+     */
+    @Transactional
+    @Override
+    public void removeHasPlayed(User user, Game game) {
+        if (!user.getHasPlayed().contains(game)) {
+            throw new IllegalArgumentException("Connection does not exist");
+        }
+
+        user.getHasPlayed().remove(game);
+        game.getHavePlayed().remove(user);
+
+        userRepository.save(user);
+        gameRepository.save(game);
+    }
+
 
 }
