@@ -79,7 +79,6 @@ public class AdminController {
         //Need to check image type HERE
         String cloudinaryUrl = cloudinaryService.uploadGameImage(coverImageFile);
 
-
         Game game = new Game(
                 gameToCreate.getTitle(),
                 gameToCreate.getDescription(),
