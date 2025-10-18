@@ -79,7 +79,7 @@ public class GameServiceImplementation implements GameService {
         if (genres != null && !genres.isEmpty()) {
             spec = spec.and((root, query, builder) -> {
                 Join<Game, Genre> genreJoin = root.join("genres");
-                return genreJoin.get("name").in(genres);
+                return genreJoin.get("title").in(genres);
             });
         }
 

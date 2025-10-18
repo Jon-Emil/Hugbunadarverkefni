@@ -131,7 +131,7 @@ public class AdminController {
         return ResponseEntity.ok().body("Successfully deleted user with id: " + user.getId());
     }
 
-    @RequestMapping(value = "/admin/updateGame/{gameID}")
+    @RequestMapping(value = "/admin/updateGame/{gameID}", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
