@@ -2,6 +2,7 @@ package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.user.MyselfUserDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.NormalUserDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,4 +115,29 @@ public class UserController {
         return ResponseEntity.ok().body("Account information changed");
     }
 
+    @GetMapping("/users/id/{userId}")
+    public ResponseEntity<?> getPublicProfileById(@PathVariable("userId") Long userId) {
+        try {
+            return ResponseEntity.ok(userService.getPublicProfileById(userId));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+    }
+
+    @GetMapping("/users/me")
+    public ResponseEntity<?> getOwnProfile(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            User me = userService.findById(userId);
+            if (me == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid user");
+            }
+            return ResponseEntity.ok(new MyselfUserDTO(me));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
+    }
 }

@@ -21,8 +21,21 @@ public class User {
     private String profilePictureURL;
     private String description;
     private Role role;
-    //private List<User>follows;
-    //private List<User>followedBy;
+    @ManyToMany
+    @JoinTable(
+            name = "user_follows",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    private List<User>follows = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_followedBy",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    private List<User>followedBy = new ArrayList<>();
     @ManyToMany
     @JoinTable(
             name = "user_favorites",
@@ -155,5 +168,13 @@ public class User {
     public void setHasPlayed(List<Game> hasPlayed) {
         this.hasPlayed = hasPlayed;
     }
+
+    public void setFollows(List<User> follows) { this.follows = follows; }
+
+    public List<User> getFollows() {return follows;}
+
+    public void setFollowedBy(List<User> followedBy) { this.followedBy = followedBy; }
+
+    public List<User> getFollowedBy() { return followedBy; }
 
 }

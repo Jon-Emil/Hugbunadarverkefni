@@ -79,7 +79,6 @@ public class AdminController {
         //Need to check image type HERE
         String cloudinaryUrl = cloudinaryService.uploadGameImage(coverImageFile);
 
-
         Game game = new Game(
                 gameToCreate.getTitle(),
                 gameToCreate.getDescription(),
@@ -132,7 +131,7 @@ public class AdminController {
         return ResponseEntity.ok().body("Successfully deleted user with id: " + user.getId());
     }
 
-    @RequestMapping(value = "/admin/updateGame/{gameID}")
+    @RequestMapping(value = "/admin/updateGame/{gameID}", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
@@ -217,7 +216,7 @@ public class AdminController {
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to delete an account");
+                        .body("You must be an admin to delete a game");
             }
         }catch (JwtException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
@@ -231,5 +230,34 @@ public class AdminController {
 
         gameService.delete(game);
         return ResponseEntity.ok().body("Successfully deleted game with id: " + gameID);
+    }
+
+    @RequestMapping(value = "admin/deleteGenre/{genreID}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteGenre(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable Long genreID
+    ) {
+        User admin;
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            admin = userService.findById(userId);
+
+            if (admin == null || admin.getRole() != Role.ADMIN) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("You must be an admin to delete a genre");
+            }
+        }catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
+
+        Genre genre = genreService.findById(genreID);
+
+        if (genre == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Genre does not exist");
+        }
+
+        genreService.delete(genre);
+        return ResponseEntity.ok().body("Successfully deleted genre with id: " + genreID);
     }
 }

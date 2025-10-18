@@ -49,10 +49,6 @@ public class Game {
     @ManyToMany(mappedBy = "hasPlayed")
     private List<User> havePlayed = new ArrayList<>();
 
-
-    public Game() {
-    }
-
     public Game(String title, String description, String releaseDate, float price, String coverImage, String developer, String publisher) {
         this.title = title;
         this.description = description;
@@ -61,6 +57,10 @@ public class Game {
         this.coverImage = coverImage;
         this.developer = developer;
         this.publisher = publisher;
+    }
+
+    public Game() {
+
     }
 
     public long getId() {
