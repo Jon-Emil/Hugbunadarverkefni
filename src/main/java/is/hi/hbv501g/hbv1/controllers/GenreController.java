@@ -29,7 +29,7 @@ public class GenreController {
     ) {
         List<Genre> allGenres = genreService.findAll();
 
-        allGenres.sort(Comparator.comparing(Genre::getTitle, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
+        allGenres.sort(Comparator.comparing(Genre::getTitle));
 
         List<NormalGenreDTO> allGenresDTOs = allGenres.stream()
                 .map(NormalGenreDTO::new)
