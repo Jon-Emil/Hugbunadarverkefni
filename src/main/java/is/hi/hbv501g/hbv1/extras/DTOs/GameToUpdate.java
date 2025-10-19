@@ -4,6 +4,10 @@ import jakarta.validation.constraints.*;
 
 import java.util.List;
 
+/**
+ * A DTO used for updating a games information and includes all information that can be changed excluding the coverImage
+ * used when the user wants to change a games information
+ */
 public class GameToUpdate {
     @Size(min = 2, max = 128, message = "Title must be between 2 and 128 characters")
     private String title;

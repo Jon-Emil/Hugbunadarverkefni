@@ -33,6 +33,11 @@ public class AuthServiceImplementation implements AuthService {
         return userRepository.save(user);
     }
 
+    /**
+     * a method that finds a user by their id and deletes them from the system
+     *
+     * @param id the id of the user we want to delete from the system
+     */
     @Override
     @Transactional
     public void deleteUserById(Long id) {

@@ -7,6 +7,11 @@ import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this is a DTO that is used as the first layer when we provide a user with information about a genre
+ * and it contains all the info of a genre including the lists of other objects but they are Referenced DTOs
+ * so they wont go in an infinite loop
+ */
 public class NormalGenreDTO {
     private long id;
     private String title;

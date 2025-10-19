@@ -9,6 +9,10 @@ import jakarta.persistence.ManyToMany;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this is a DTO that is used as the second layer when we provide a user with information about a genre
+ * so it includes all info about a genre excluding references to other objects to avoid infinite recursion
+ */
 public class ReferencedGenreDTO {
     private long id;
     private String title;

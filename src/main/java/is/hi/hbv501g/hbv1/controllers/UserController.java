@@ -34,6 +34,14 @@ public class UserController {
         this.cloudinaryService = cloudinaryService;
     }
 
+    /**
+     * a get method that allows the user to see all users in the system
+     *
+     * @param pageNr which page to show [default = 1]
+     * @param perPage how many genres per page [default = 10]
+     *
+     * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
+     */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public PaginatedResponse<NormalUserDTO> allUsers(
             @RequestParam(defaultValue = "1") int pageNr,
@@ -45,6 +53,13 @@ public class UserController {
         return new PaginatedResponse<NormalUserDTO>(200, allGameDTOs, pageNr,perPage);
     }
 
+    /**
+     * a method that allows the user to delete the account they are currently logged in to
+     *
+     * @param authHeader the header where the session token is stored
+     *
+     * @return a response entity with a status code and a message that will tell the user how the request went
+     */
     @RequestMapping(value = "/users", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader
@@ -68,6 +83,16 @@ public class UserController {
         return ResponseEntity.ok().body("Your account has been successfully deleted");
     }
 
+    /**
+     * a patch method that allows the user to change their account information
+     *
+     * @param authHeader the header where the session token is stored
+     * @param userInfo the data that the user wants to change
+     * @param res a binding result that tells us if the userInfo meets all requirements
+     * @param profilePictureFile a picture that will replace the old profile picture and can be left blank to not replace it
+     *
+     * @return a response entity with a status code and a message that will tell the user how the request went
+     */
     @RequestMapping(value = "/users", method = RequestMethod.PATCH)
     public ResponseEntity<String> changeLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader,
@@ -115,6 +140,13 @@ public class UserController {
         return ResponseEntity.ok().body("Account information changed");
     }
 
+    /**
+     * gets the info of a specific user in the system
+     *
+     * @param userId the id of  the user
+     *
+     * @return response entity with either the users info or an error message
+     */
     @GetMapping("/users/id/{userId}")
     public ResponseEntity<?> getPublicProfileById(@PathVariable("userId") Long userId) {
         try {
@@ -124,6 +156,13 @@ public class UserController {
         }
     }
 
+    /**
+     * a method that allows the user to see their own profile
+     *
+     * @param authHeader the header where the session token is stored
+     *
+     * @return a response entity with the info of the user that is logged in or an error message
+     */
     @GetMapping("/users/me")
     public ResponseEntity<?> getOwnProfile(
             @RequestHeader("Authorization") String authHeader

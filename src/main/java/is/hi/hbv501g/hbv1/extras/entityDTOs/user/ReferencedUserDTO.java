@@ -6,6 +6,10 @@ import is.hi.hbv501g.hbv1.persistence.entities.User;
 
 import java.util.List;
 
+/**
+ * this is a DTO that is used as the second layer when we provide a user with information about a user
+ * so it includes all info about a user excluding references to other objects to avoid infinite recursion
+ */
 public class ReferencedUserDTO {
     private Long id;
     private String username;

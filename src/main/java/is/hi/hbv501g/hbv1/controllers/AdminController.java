@@ -45,6 +45,16 @@ public class AdminController {
         this.userService = userService;
     }
 
+    /**
+     * a Post method that allows the user to add a game to the system as long as they are logged in to an admin account
+     *
+     * @param authHeader The header where the session token is stored
+     * @param gameToCreate Information about the game that is being created
+     * @param res the BindingResults of the gameToCreate which just tell us if the gameToCreate conforms to the rules it has
+     * @param coverImageFile The image file that will become the cover for this new game
+     *                       
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value = "/admin/addGame", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)
     public ResponseEntity<String> addGame(
             @RequestHeader(value = "Authorization") String authHeader,
@@ -93,6 +103,7 @@ public class AdminController {
         return ResponseEntity.ok("Game added!");
     }
 
+    // not finished
     @RequestMapping(value = "/admin/addGenre", method = RequestMethod.POST)
     public ResponseEntity<String> addGenre(@RequestBody Genre genre) {
 
@@ -101,6 +112,14 @@ public class AdminController {
         return ResponseEntity.ok("Genre added!");
     }
 
+    /**
+     * A delete method that allows an admin to remove an account from the system
+     *
+     * @param authHeader the header where the session token is stored
+     * @param userID the id of the user that we want to delete from our system
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value = "admin/deleteUser/{userID}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader,
@@ -131,6 +150,17 @@ public class AdminController {
         return ResponseEntity.ok().body("Successfully deleted user with id: " + user.getId());
     }
 
+    /**
+     * A patch method that allows an admin to change the data of a specific game
+     *
+     * @param authHeader the header where the session token is stored
+     * @param gameID id of the game we want to change
+     * @param gameInfo the data that we want to change
+     * @param res a binding result that we can use to verify if the gameInfo is valid
+     * @param coverImageFile the image that will replace the old coverImage can be left empty for no change
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value = "/admin/updateGame/{gameID}", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateGame(
             @RequestHeader(value = "Authorization") String authHeader,
@@ -202,6 +232,14 @@ public class AdminController {
         return ResponseEntity.ok().body("Successfully updated game with id: " + gameID);
     }
 
+    /**
+     * a delete method that allows an admin to delete a specific game from the system
+     *
+     * @param authHeader the header where the session token is stored
+     * @param gameID the id of the game we want to delete
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value = "/admin/deleteGame/{gameID}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteGame(
             @RequestHeader(value = "Authorization") String authHeader,
@@ -232,6 +270,14 @@ public class AdminController {
         return ResponseEntity.ok().body("Successfully deleted game with id: " + gameID);
     }
 
+    /**
+     * a method that allows an admin to delete a genre from the system
+     *
+     * @param authHeader the header where the session token is stored
+     * @param genreID the id of the genre we want to delete
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value = "admin/deleteGenre/{genreID}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteGenre(
             @RequestHeader(value = "Authorization") String authHeader,

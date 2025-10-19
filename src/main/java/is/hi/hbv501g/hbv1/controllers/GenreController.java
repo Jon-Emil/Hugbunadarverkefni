@@ -22,6 +22,14 @@ public class GenreController {
         this.gameService = gameService;
     }
 
+    /**
+     * a get method that allows the user to see all genres in the system
+     *
+     * @param pageNr which page to show [default = 1]
+     * @param perPage how many genres per page [default = 10]
+     *
+     * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
+     */
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
     public PaginatedResponse<NormalGenreDTO> allGenres(
             @RequestParam(defaultValue = "1") int pageNr,
@@ -38,6 +46,7 @@ public class GenreController {
         return new PaginatedResponse<>(200, allGenresDTOs, pageNr, perPage);
     }
 
+    // not finished
     @RequestMapping(value = "/genres/{genreID}", method = RequestMethod.GET)
     public NormalGenreDTO genreDetails(@PathVariable Long genreID) {
         Genre genre = genreService.findById(genreID);

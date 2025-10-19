@@ -3,7 +3,8 @@ package is.hi.hbv501g.hbv1.extras.DTOs;
 import java.util.List;
 
 /**
- * This is a simple wrapper class for the search criteria in our API
+ * This is a DTO containing all the information that is possible to provide as search parameters for games
+ * used when the user wants to find a game by specific parameters
  */
 
 public class SearchCriteria {
