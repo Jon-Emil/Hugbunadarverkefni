@@ -12,6 +12,12 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this is a DTO that is used as the first layer when we provide a user with information about a user
+ * and it contains nearly all the info of a user including the lists of other objects but they are Referenced DTOs
+ * so they wont go in an infinite loop
+ * does not contain the email or hashed password of the user
+ */
 public class NormalUserDTO {
     private Long id;
     private String username;

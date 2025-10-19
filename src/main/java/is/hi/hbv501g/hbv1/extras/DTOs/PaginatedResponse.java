@@ -4,7 +4,8 @@ import java.util.List;
 
 /**
  * This is a simple wrapper class for the final output of our API
- * @param <T>
+ * @param <T> the type of object the data list is supposed to contain
+ * used when we want to send paginated lists to the user
  */
 
 public class PaginatedResponse<T> {

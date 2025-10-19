@@ -2,6 +2,10 @@ package is.hi.hbv501g.hbv1.extras.entityDTOs.game;
 
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 
+/**
+ * this is a DTO that is used as the second layer when we provide a user with information about a game
+ * so it includes all info about a game excluding references to other objects to avoid infinite recursion
+ */
 public class ReferencedGameDTO {
     private long id;
     private String title;

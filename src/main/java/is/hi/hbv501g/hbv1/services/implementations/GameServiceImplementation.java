@@ -36,33 +36,70 @@ public class GameServiceImplementation implements GameService {
     }
 
 
-
+    /**
+     * finds a game by its id
+     *
+     * @param id the id of the game
+     *
+     * @return the game that was found and if no game was found returns null
+     */
     @Override
     public Game findById(Long id) {
         return gameRepository.findById(id).orElse(null);
     }
 
+    /**
+     * finds all games in the system
+     *
+     * @return all games in the system as a List<Game> object
+     */
     @Override
     public List<Game> findAll() {
         return gameRepository.findAll();
     }
 
+    /**
+     * finds a game by its title
+     *
+     * @param title the title of the game
+     *
+     * @return the first game it finds with that title
+     */
     @Override
     public Game findByTitle(String title) {
         //Should fix get first to return list if many games have same title
         return gameRepository.findByTitle(title).getFirst();
     }
 
+    /**
+     * saves a game to the system
+     *
+     * @param game the game object that is supposed to be saved
+     *
+     * @return the game that was saved
+     */
     @Override
     public Game save(Game game) {
         return gameRepository.save(game);
     }
 
+    /**
+     * deletes a game from the system
+     *
+     * @param game the game that is supposed to be deleted
+     */
     @Override
     public void delete(Game game) {
         gameRepository.delete(game);
     }
 
+    /**
+     * finds all games in the system that meet the search parameters
+     *
+     * @param params a SearchCriteria object containing all the search parameters
+     *
+     * @return a list of all games that matched the search parameters
+     */
     @Override
     public List<Game> search(SearchCriteria params) {
         // where() is currently marked as depricated but according to a stackoverflow thread there is no good replacement yet
@@ -118,6 +155,14 @@ public class GameServiceImplementation implements GameService {
         return gameRepository.findAll(spec);
     }
 
+    /**
+     * adds a list of genres to the specified game
+     *
+     * @param game the game that the genres are to be added to
+     * @param genreIds the list of ids of the genres
+     *
+     * @return the new game object
+     */
     @Override
     public Game add(Game game, List<Long> genreIds) {
         List<Genre> genres = genreRepository.findAllById(genreIds);
@@ -126,6 +171,7 @@ public class GameServiceImplementation implements GameService {
     }
 
     /**
+     * adds a review from a user to a specific game
      *
      * @param user A user that exists in the system and who the review will be linked to
      * @param game A game that exists in the system and what the review will be linked to

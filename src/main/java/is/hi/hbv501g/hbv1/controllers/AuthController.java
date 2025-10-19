@@ -27,6 +27,13 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * a method that allows the user to log in to their account
+     *
+     * @param credentials the email and password of the account the user wants to log in to
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value="/login", method=RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody Credentials credentials) {
         if (credentials.getEmail() == null || credentials.getPassword() == null) {
@@ -52,6 +59,13 @@ public class AuthController {
                 .body(token);
     }
 
+    /**
+     * a method that allows the user to create a new account
+     *
+     * @param credentials the password and email of the new account
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
     @RequestMapping(value="/register", method=RequestMethod.POST)
     public ResponseEntity<?> register(@RequestBody Credentials credentials) {
         User user = authService.findByEmail(credentials.getEmail());
@@ -69,37 +83,4 @@ public class AuthController {
                 .header("Authorization", "Bearer " + token)
                 .body(token);
     }
-
-    /*
-    @DeleteMapping("/auth/delete")
-    public ResponseEntity<?> deleteAccount(
-            @RequestHeader(name = "Authorization", required = false) String authHeader
-    ) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body("Missing or invalid Authorization header");
-        }
-
-        String token = authHeader.substring(7);
-        Long userId;
-        try {
-            userId = jwtHelper.extractUserId(token);
-        } catch (Exception e) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body("Invalid or expired token");
-        }
-
-        try {
-            authService.deleteUserById(userId);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("User not found");
-        }
-
-        return ResponseEntity.noContent().build();
-    }
-    */
 }

@@ -11,23 +11,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
 
+/**
+ * this is a DTO that is used as the second layer when we provide a user with information about a review
+ * so it includes all info about a review excluding references to other objects to avoid infinite recursion
+ */
 public class ReferencedReviewDTO {
     private Long id;
     private int rating;
     private String text;
     private String title;
 
-    private ReferencedUserDTO user;
-    private ReferencedGameDTO game;
-
     public ReferencedReviewDTO(Review review) {
         this.id = review.getId();
         this.rating = review.getRating();
         this.text = review.getText();
         this.title = review.getTitle();
-
-        this.user = new ReferencedUserDTO(review.getUser());
-        this.game = new ReferencedGameDTO(review.getGame());
     }
 
     public Long getId() {
@@ -44,13 +42,5 @@ public class ReferencedReviewDTO {
 
     public String getTitle() {
         return title;
-    }
-
-    public ReferencedUserDTO getUser() {
-        return user;
-    }
-
-    public ReferencedGameDTO getGame() {
-        return game;
     }
 }

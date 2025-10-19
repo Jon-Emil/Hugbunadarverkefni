@@ -4,6 +4,10 @@ import jakarta.validation.constraints.*;
 
 import java.util.List;
 
+/**
+ * A DTO containing all the information needed to create a new game not including the coverImage
+ * used when the user wants to add a game to our system
+ */
 public class GameToCreate {
     @NotBlank (message = "Game must have a title")
     @Size (min = 2, max = 128, message = "Title must be between 2 and 128 characters")

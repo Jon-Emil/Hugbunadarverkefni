@@ -23,26 +23,57 @@ public class UserServiceImplementation implements UserService {
         this.gameRepository = gameRepository;
     }
 
+    /**
+     * finds a user by their id
+     *
+     * @param id the id of the user
+     *
+     * @return the found user or null if no user was found
+     */
     @Override
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
+    /**
+     * finds all users in the system
+     *
+     * @return a list of all users in the system
+     */
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
+    /**
+     * finds a user by their username
+     *
+     * @param username the username of the user we want to find
+     *
+     * @return the first user found
+     */
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).getFirst();
     }
 
+    /**
+     * saves a user to the system
+     *
+     * @param user the user we want to save to the system
+     *
+     * @return the user that was saved to the system
+     */
     @Override
     public User save(User user) {
         return userRepository.save(user);
     }
 
+    /**
+     * deletes a user from the system
+     *
+     * @param user the user we want to delete from the system
+     */
     @Override
     public void delete(User user) { userRepository.delete(user); }
 

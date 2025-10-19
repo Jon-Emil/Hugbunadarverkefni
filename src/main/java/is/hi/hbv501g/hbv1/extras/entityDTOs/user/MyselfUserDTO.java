@@ -7,6 +7,11 @@ import is.hi.hbv501g.hbv1.persistence.entities.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this is a DTO containing all information about a user just like the NormalUserDTO
+ * but also sensitive information like role and email
+ * this is meant to be only used when sending a user information about the account they are logged into
+ */
 public class MyselfUserDTO {
     private Long id;
     private String email;
