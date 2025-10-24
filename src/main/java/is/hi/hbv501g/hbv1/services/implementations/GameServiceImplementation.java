@@ -183,7 +183,7 @@ public class GameServiceImplementation implements GameService {
     @Override
     @Transactional
     public Review postReview(User user, Game game, Review incomingReview) {
-        Optional<Review> existingReview = reviewRepository.findByGameAndUser(game, user);;
+        Optional<Review> existingReview = reviewRepository.findByGameAndUser(game, user);
 
         if (existingReview.isPresent()) {
             throw new IllegalArgumentException("Review already exists for this user and game");
