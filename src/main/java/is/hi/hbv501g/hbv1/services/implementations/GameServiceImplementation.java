@@ -14,7 +14,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -201,6 +203,9 @@ public class GameServiceImplementation implements GameService {
 
     @Override
     public List<Game> listAllByGenreIdSorted(Long genreId) {
+        if(!genreRepository.existsById(genreId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Genre not found: " +  genreId);
+        }
         return gameRepository.findDistinctByGenres_Id(genreId, Sort.by(Sort.Direction.ASC, "title"));
     }
 }
