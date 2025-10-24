@@ -3,8 +3,8 @@ package is.hi.hbv501g.hbv1.persistence.repositories;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import java.util.List;
+import org.springframework.data.domain.Sort;
 
 public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificationExecutor<Game> {
     Game save(Game game);
@@ -12,4 +12,5 @@ public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificat
     Game findById(long id);
     List<Game> findAll();
     void delete(Game game);
+    List<Game> findDistinctByGenres_Id(Long genreId, Sort sort);
 }

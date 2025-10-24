@@ -18,4 +18,5 @@ public interface GameService {
     Game add(Game game, List<Long> genreIds);
 
     Review postReview(User user, Game game, Review incomingReview);
+    List<Game> listAllByGenreIdSorted(Long genreId);
 }

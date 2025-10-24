@@ -12,6 +12,7 @@ import is.hi.hbv501g.hbv1.services.GameService;
 import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -196,5 +197,10 @@ public class GameServiceImplementation implements GameService {
         review.setGame(game);
 
         return reviewRepository.save(review);
+    }
+
+    @Override
+    public List<Game> listAllByGenreIdSorted(Long genreId) {
+        return gameRepository.findDistinctByGenres_Id(genreId, Sort.by(Sort.Direction.ASC, "title"));
     }
 }

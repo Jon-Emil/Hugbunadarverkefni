@@ -380,4 +380,17 @@ public class GameController {
             return ResponseEntity.badRequest().body(error.getMessage());
         }
     }
+
+    @GetMapping("/games/genre/{genreId}")
+    public PaginatedResponse<NormalGameDTO> listGamesByGenreId(
+            @PathVariable long genreId,
+            @RequestParam(defaultValue = "1") int pageNr,
+            @RequestParam(defaultValue = "10") int perPage
+    ) {
+        List<Game> games = gameService.listAllByGenreIdSorted(genreId);
+
+        List<NormalGameDTO> gamesDTO = games.stream().map(NormalGameDTO::new).toList();
+
+        return new PaginatedResponse<>(200, gamesDTO, pageNr, perPage);
+    }
 }
