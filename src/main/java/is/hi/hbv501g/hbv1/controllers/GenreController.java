@@ -37,7 +37,18 @@ public class GenreController {
     ) {
         List<Genre> allGenres = genreService.findAll();
 
-        allGenres.sort(Comparator.comparing(Genre::getTitle));
+        allGenres.sort(
+                Comparator.comparing(
+                        (Genre g) -> g.getTitle() == null ? null : g.getTitle().trim(),
+                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+                ).thenComparingLong(Genre::getId)
+        );
+
+        /* allGenres.sort(Comparator.comparing(Genre::getTitle)); */
+
+        // skipt út af kóðanum fyrir ofan til þess að láta sort-aðferðina þola null-gildi á title.
+        // þið megið endilega breytt þessu þegar búið hefur verið að bæta business logic og
+        // klasastrúktúr af þessu UC. Yi Hu 24 okt.
 
         List<NormalGenreDTO> allGenresDTOs = allGenres.stream()
                 .map(NormalGenreDTO::new)
