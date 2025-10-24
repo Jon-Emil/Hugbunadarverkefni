@@ -200,12 +200,4 @@ public class GameServiceImplementation implements GameService {
 
         return reviewRepository.save(review);
     }
-
-    @Override
-    public List<Game> listAllByGenreIdSorted(Long genreId) {
-        if(!genreRepository.existsById(genreId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Genre not found: " +  genreId);
-        }
-        return gameRepository.findDistinctByGenres_Id(genreId, Sort.by(Sort.Direction.ASC, "title"));
-    }
 }

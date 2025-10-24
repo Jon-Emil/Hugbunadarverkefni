@@ -12,5 +12,4 @@ public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificat
     Game findById(long id);
     List<Game> findAll();
     void delete(Game game);
-    List<Game> findDistinctByGenres_Id(Long genreId, Sort sort);
 }
