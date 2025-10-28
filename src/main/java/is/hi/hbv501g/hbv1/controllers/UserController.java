@@ -28,7 +28,7 @@ public class UserController {
     private final JWTHelper jwtHelper;
     private final CloudinaryService cloudinaryService;
     private final SortHelper sortHelper;
-    
+
 
     @Autowired
     public UserController(UserService userService, JWTHelper jwtHelper, CloudinaryService cloudinaryService, SortHelper sortHelper) {
@@ -41,9 +41,8 @@ public class UserController {
     /**
      * a get method that allows the user to see all users in the system
      *
-     * @param pageNr which page to show [default = 1]
+     * @param pageNr  which page to show [default = 1]
      * @param perPage how many genres per page [default = 10]
-     *
      * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
@@ -57,14 +56,13 @@ public class UserController {
         allUsers = sortHelper.sortUsers(allUsers, sortBy, sortReverse);
         List<NormalUserDTO> allGameDTOs = allUsers.stream()
                 .map(NormalUserDTO::new).toList();
-        return new PaginatedResponse<NormalUserDTO>(200, allGameDTOs, pageNr,perPage);
+        return new PaginatedResponse<NormalUserDTO>(200, allGameDTOs, pageNr, perPage);
     }
 
     /**
      * a method that allows the user to delete the account they are currently logged in to
      *
      * @param authHeader the header where the session token is stored
-     *
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users", method = RequestMethod.DELETE)
@@ -82,7 +80,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("You must be logged in to delete your account");
             }
-        }catch (JwtException e){
+        } catch (JwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
         }
 
@@ -93,11 +91,10 @@ public class UserController {
     /**
      * a patch method that allows the user to change their account information
      *
-     * @param authHeader the header where the session token is stored
-     * @param userInfo the data that the user wants to change
-     * @param res a binding result that tells us if the userInfo meets all requirements
+     * @param authHeader         the header where the session token is stored
+     * @param userInfo           the data that the user wants to change
+     * @param res                a binding result that tells us if the userInfo meets all requirements
      * @param profilePictureFile a picture that will replace the old profile picture and can be left blank to not replace it
-     *
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users", method = RequestMethod.PATCH)
@@ -118,7 +115,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("You must be logged in to change your account");
             }
-        }catch (JwtException e){
+        } catch (JwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
         }
 
@@ -151,7 +148,6 @@ public class UserController {
      * gets the info of a specific user in the system
      *
      * @param userId the id of  the user
-     *
      * @return response entity with either the users info or an error message
      */
     @GetMapping("/users/id/{userId}")
@@ -167,7 +163,6 @@ public class UserController {
      * a method that allows the user to see their own profile
      *
      * @param authHeader the header where the session token is stored
-     *
      * @return a response entity with the info of the user that is logged in or an error message
      */
     @GetMapping("/users/me")
@@ -190,5 +185,7 @@ public class UserController {
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.POST)
     public ResponseEntity<String> followUser(
 
-    )
+    ){
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Not implemented");
+    }
 }
