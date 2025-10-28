@@ -38,7 +38,7 @@ public class GenreController {
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
-            @RequestParam(defaultValue = "false") boolean  sortReverse
+            @RequestParam(defaultValue = "false") boolean sortReverse
     ) {
         List<Genre> allGenres = genreService.findAll();
 

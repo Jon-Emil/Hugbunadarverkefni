@@ -76,7 +76,7 @@ public class GameController {
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
-            @RequestParam(defaultValue = "false") boolean  sortReverse
+            @RequestParam(defaultValue = "false") Boolean sortReverse
     ) {
         // get all games
         List<Game> allGames = gameService.findAll();
@@ -128,7 +128,7 @@ public class GameController {
             @RequestParam(required = false) String publisher,
             @RequestParam(required = false) List<String> genres,
             @RequestParam(defaultValue = "title") String sortBy,
-            @RequestParam(defaultValue = "false") boolean  sortReverse
+            @RequestParam(defaultValue = "false") Boolean sortReverse
             ) {
         SearchCriteria params = new SearchCriteria(
                 title, minPrice, maxPrice, releasedAfter, releasedBefore, developer, publisher, genres

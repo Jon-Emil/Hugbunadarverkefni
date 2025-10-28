@@ -51,7 +51,7 @@ public class UserController {
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "false") boolean  sortReverse
+            @RequestParam(defaultValue = "false") Boolean sortReverse
     ) {
         List<User> allUsers = userService.findAll();
         allUsers = sortHelper.sortUsers(allUsers, sortBy, sortReverse);

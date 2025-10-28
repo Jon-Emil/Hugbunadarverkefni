@@ -9,15 +9,37 @@ import org.springframework.stereotype.Component;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Simple class that handles all sorting for our system.
+ *
+ * all methods follow this logic:
+ *
+ * handle nulls
+ * match sortBy and create comparator
+ * reverse comparator if reverse is true
+ * sort and return list
+ */
+
 @Component
 public class SortHelper {
 
-    public List<Game> sortGames(List<Game> games, String sortBy, boolean reversed) {
+    /**
+     * sorts a list of games
+     * @param games the game list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of games that is sorted and contains the exact same games
+     */
+    public List<Game> sortGames(List<Game> games, String sortBy, Boolean reversed) {
         if (games == null) {
             return null;
         }
         if (sortBy == null) {
             sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
         }
 
         Comparator<Game> comparator = null;
@@ -92,12 +114,23 @@ public class SortHelper {
         return games;
     }
 
+    /**
+     * sorts a list of genres
+     * @param genres the genre list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of genres that is sorted and contains the exact same genres
+     */
     public List<Genre> sortGenres(List<Genre> genres, String sortBy, Boolean reversed) {
         if (genres == null) {
             return null;
         }
         if (sortBy == null) {
             sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
         }
 
         Comparator<Genre> comparator = null;
@@ -127,12 +160,23 @@ public class SortHelper {
         return genres;
     }
 
+    /**
+     * sorts a list of reviews
+     * @param reviews the review list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of reviews that is sorted and contains the exact same reviews
+     */
     public List<Review> sortReviews(List<Review> reviews, String sortBy, Boolean reversed) {
         if (reviews == null) {
             return null;
         }
         if (sortBy == null) {
             sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
         }
 
         Comparator<Review> comparator = null;
@@ -172,12 +216,23 @@ public class SortHelper {
         return reviews;
     }
 
+    /**
+     * sorts a list of users
+     * @param users the user list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of users that is sorted and contains the exact same users
+     */
     public List<User> sortUsers(List<User> users, String sortBy, Boolean reversed) {
         if (users == null) {
             return null;
         }
         if (sortBy == null) {
             sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
         }
 
         Comparator<User> comparator = null;
@@ -213,7 +268,7 @@ public class SortHelper {
                 );
                 reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
-            case "wantToPlayAmount":
+            case "wantsToPlayAmount":
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getWantsToPlay() == null ? 0 : u.getWantsToPlay().size()
                 );
