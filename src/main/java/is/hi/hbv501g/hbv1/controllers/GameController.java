@@ -5,10 +5,9 @@ import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
+import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
-
-import java.util.Comparator;
 
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
@@ -28,16 +27,19 @@ public class GameController {
     private final GameService gameService;
     private final UserService userService;
     private final JWTHelper jwtHelper;
+    private final SortHelper sortHelper;
 
     @Autowired
     public GameController(
             GameService gameService,
             UserService userService,
-            JWTHelper jwtHelper
+            JWTHelper jwtHelper,
+            SortHelper sortHelper
     ) {
         this.gameService = gameService;
         this.userService = userService;
         this.jwtHelper = jwtHelper;
+        this.sortHelper = sortHelper;
     }
 
     /**
@@ -72,13 +74,15 @@ public class GameController {
     @RequestMapping(value = "/games", method = RequestMethod.GET)
     public PaginatedResponse<NormalGameDTO> allGames(
             @RequestParam(defaultValue = "1") int pageNr,
-            @RequestParam(defaultValue = "10") int perPage
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "false") boolean  sortReverse
     ) {
         // get all games
         List<Game> allGames = gameService.findAll();
 
         // sort list
-        allGames.sort(Comparator.comparing(Game::getTitle));
+        allGames = sortHelper.sortGames(allGames, sortBy, sortReverse);
 
         // convert to DTOs
         List<NormalGameDTO> allGameDTOs = allGames.stream()

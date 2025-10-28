@@ -4,10 +4,12 @@ import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
 
+@Component
 public class SortHelper {
 
     public List<Game> sortGames(List<Game> games, String sortBy, boolean reversed) {
@@ -52,21 +54,25 @@ public class SortHelper {
                 comparator = Comparator.comparingInt(
                         (Game g) -> g.getReviews() == null ? 0 : g.getReviews().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "favoritesAmount":
                 comparator = Comparator.comparingInt(
                         (Game g) -> g.getFavoriteOf() == null ? 0 : g.getFavoriteOf().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "wantToPlayAmount":
                 comparator = Comparator.comparingInt(
                         (Game g) -> g.getWantToPlay() == null ? 0 : g.getWantToPlay().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "havePlayedAmount":
                 comparator = Comparator.comparingInt(
                         (Game g) -> g.getHavePlayed() == null ? 0 : g.getHavePlayed().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "averageRating":
                 comparator = Comparator.comparing(
@@ -107,6 +113,7 @@ public class SortHelper {
                 comparator = Comparator.comparingInt(
                         (Genre g) -> g.getGames() == null ? 0 : g.getGames().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             default:
                 comparator = Comparator.comparingLong(Genre::getId);
@@ -139,6 +146,7 @@ public class SortHelper {
                 break;
             case "rating":
                 comparator = Comparator.comparingInt(Review::getRating);
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "username":
                 comparator = Comparator.comparing(
@@ -185,31 +193,37 @@ public class SortHelper {
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getFollowedBy() == null ? 0 : u.getFollowedBy().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "following":
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getFollows() == null ? 0 : u.getFollows().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "reviewAmount":
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getReviews() == null ? 0 : u.getReviews().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "favoriteAmount":
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getFavorites() == null ? 0 : u.getFavorites().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "wantToPlayAmount":
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getWantsToPlay() == null ? 0 : u.getWantsToPlay().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             case "hasPlayedAmount":
                 comparator = Comparator.comparingInt(
                         (User u) -> u.getHasPlayed() == null ? 0 : u.getHasPlayed().size()
                 );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
                 break;
             default:
                 comparator = Comparator.comparingLong(User::getId);
