@@ -5,6 +5,7 @@ import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
+import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
@@ -32,6 +33,7 @@ public class GameController {
     private final GameService gameService;
     private final UserService userService;
     private final JWTHelper jwtHelper;
+    private final SortHelper sortHelper;
     private final GenreService genreService;
 
     @Autowired
@@ -39,11 +41,13 @@ public class GameController {
             GameService gameService,
             UserService userService,
             JWTHelper jwtHelper,
+            SortHelper sortHelper
             GenreService genreService
     ) {
         this.gameService = gameService;
         this.userService = userService;
         this.jwtHelper = jwtHelper;
+        this.sortHelper = sortHelper;
         this.genreService = genreService;
     }
 
@@ -79,13 +83,15 @@ public class GameController {
     @RequestMapping(value = "/games", method = RequestMethod.GET)
     public PaginatedResponse<NormalGameDTO> allGames(
             @RequestParam(defaultValue = "1") int pageNr,
-            @RequestParam(defaultValue = "10") int perPage
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "false") Boolean sortReverse
     ) {
         // get all games
         List<Game> allGames = gameService.findAll();
 
         // sort list
-        allGames.sort(Comparator.comparing(Game::getTitle));
+        allGames = sortHelper.sortGames(allGames, sortBy, sortReverse);
 
         // convert to DTOs
         List<NormalGameDTO> allGameDTOs = allGames.stream()
@@ -129,12 +135,15 @@ public class GameController {
             @RequestParam(required = false) String releasedBefore,
             @RequestParam(required = false) String developer,
             @RequestParam(required = false) String publisher,
-            @RequestParam(required = false) List<String> genres
+            @RequestParam(required = false) List<String> genres,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "false") Boolean sortReverse
             ) {
         SearchCriteria params = new SearchCriteria(
                 title, minPrice, maxPrice, releasedAfter, releasedBefore, developer, publisher, genres
         );
         List<Game> foundGames = gameService.search(params);
+        foundGames = sortHelper.sortGames(foundGames, sortBy, sortReverse);
         List<NormalGameDTO> allGameDTOs = foundGames.stream()
                 .map(NormalGameDTO::new).toList();
         return new PaginatedResponse<NormalGameDTO>(200, allGameDTOs, pageNr,perPage);

@@ -8,10 +8,12 @@ import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.UserToUpdate;
+import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,13 +27,15 @@ public class UserController {
     private final UserService userService;
     private final JWTHelper jwtHelper;
     private final CloudinaryService cloudinaryService;
+    private final SortHelper sortHelper;
     
 
     @Autowired
-    public UserController(UserService userService, JWTHelper jwtHelper, CloudinaryService cloudinaryService) {
+    public UserController(UserService userService, JWTHelper jwtHelper, CloudinaryService cloudinaryService, SortHelper sortHelper) {
         this.userService = userService;
         this.jwtHelper = jwtHelper;
         this.cloudinaryService = cloudinaryService;
+        this.sortHelper = sortHelper;
     }
 
     /**
@@ -45,9 +49,12 @@ public class UserController {
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public PaginatedResponse<NormalUserDTO> allUsers(
             @RequestParam(defaultValue = "1") int pageNr,
-            @RequestParam(defaultValue = "10") int perPage
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "false") Boolean sortReverse
     ) {
         List<User> allUsers = userService.findAll();
+        allUsers = sortHelper.sortUsers(allUsers, sortBy, sortReverse);
         List<NormalUserDTO> allGameDTOs = allUsers.stream()
                 .map(NormalUserDTO::new).toList();
         return new PaginatedResponse<NormalUserDTO>(200, allGameDTOs, pageNr,perPage);

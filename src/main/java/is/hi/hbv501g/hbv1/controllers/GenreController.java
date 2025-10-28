@@ -2,6 +2,7 @@ package is.hi.hbv501g.hbv1.controllers;
 
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.NormalGenreDTO;
+import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.GenreService;
@@ -15,11 +16,13 @@ import java.util.List;
 public class GenreController {
     private final GenreService genreService;
     private final GameService gameService;
+    private final SortHelper sortHelper;
 
     @Autowired
-    public GenreController(GenreService genreService, GameService gameService) {
+    public GenreController(GenreService genreService, GameService gameService, SortHelper sortHelper) {
         this.genreService = genreService;
         this.gameService = gameService;
+        this.sortHelper = sortHelper;
     }
 
     /**
@@ -33,22 +36,13 @@ public class GenreController {
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
     public PaginatedResponse<NormalGenreDTO> allGenres(
             @RequestParam(defaultValue = "1") int pageNr,
-            @RequestParam(defaultValue = "10") int perPage
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "false") boolean sortReverse
     ) {
         List<Genre> allGenres = genreService.findAll();
 
-        allGenres.sort(
-                Comparator.comparing(
-                        (Genre g) -> g.getTitle() == null ? null : g.getTitle().trim(),
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-                ).thenComparingLong(Genre::getId)
-        );
-
-        /* allGenres.sort(Comparator.comparing(Genre::getTitle)); */
-
-        // skipt út af kóðanum fyrir ofan til þess að láta sort-aðferðina þola null-gildi á title.
-        // þið megið endilega breytt þessu þegar búið hefur verið að bæta business logic og
-        // klasastrúktúr af þessu UC. Yi Hu 24 okt.
+        allGenres = sortHelper.sortGenres(allGenres, sortBy, sortReverse);
 
         List<NormalGenreDTO> allGenresDTOs = allGenres.stream()
                 .map(NormalGenreDTO::new)
