@@ -186,4 +186,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
         }
     }
+
+    @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.POST)
+    public ResponseEntity<String> followUser(
+
+    )
 }

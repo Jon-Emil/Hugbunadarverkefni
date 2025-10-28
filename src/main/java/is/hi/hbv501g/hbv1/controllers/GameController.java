@@ -41,7 +41,7 @@ public class GameController {
             GameService gameService,
             UserService userService,
             JWTHelper jwtHelper,
-            SortHelper sortHelper
+            SortHelper sortHelper,
             GenreService genreService
     ) {
         this.gameService = gameService;
