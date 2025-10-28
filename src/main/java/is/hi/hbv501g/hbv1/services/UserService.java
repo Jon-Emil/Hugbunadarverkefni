@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserService {
     User findById(Long id);
     List<User> findAll();
-    User findByUsername(String username);
+    List<User> findByUsernameContaining(String username);
     User save(User user);
     void delete(User user);
     void addFavorite(User user, Game game);
