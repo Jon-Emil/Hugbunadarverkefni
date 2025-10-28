@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.MyselfUserDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.NormalUserDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.user.ReferencedUserDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
@@ -187,5 +188,34 @@ public class UserController {
 
     ){
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Not implemented");
+    }
+
+
+    /**
+     * Handles GET requests on /users/search
+     *
+     * @param pageNr Which page to show 1 is first page [default = 1]
+     * @param perPage How many items per page [default = 10]
+     * @param username The username that is being searched for.
+     * @param sortBy What to sort the results by.
+     * @param sortReverse Whether to reverse the results or not.
+     *
+     * @return A PaginatedResponse with a status code of 200, how many users are in total that match the search
+     * and a list of all users that match the search.
+     */
+    @RequestMapping(value = "/users/search", method = RequestMethod.GET)
+    public PaginatedResponse<ReferencedUserDTO> searchUsers(
+            @RequestParam(defaultValue = "1") int pageNr,
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam String username,
+            @RequestParam(defaultValue = "username") String sortBy,
+            @RequestParam(defaultValue = "false") Boolean sortReverse
+    ){
+        List<User> foundUsers = userService.findByUsernameContaining(username);
+        foundUsers = sortHelper.sortUsers(foundUsers, sortBy, sortReverse);
+
+        List<ReferencedUserDTO> displayList = foundUsers.stream()
+                .map(ReferencedUserDTO::new).toList();
+        return new PaginatedResponse<ReferencedUserDTO>(200, displayList, pageNr, perPage);
     }
 }
