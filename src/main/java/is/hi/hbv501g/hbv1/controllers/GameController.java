@@ -126,12 +126,15 @@ public class GameController {
             @RequestParam(required = false) String releasedBefore,
             @RequestParam(required = false) String developer,
             @RequestParam(required = false) String publisher,
-            @RequestParam(required = false) List<String> genres
+            @RequestParam(required = false) List<String> genres,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "false") boolean  sortReverse
             ) {
         SearchCriteria params = new SearchCriteria(
                 title, minPrice, maxPrice, releasedAfter, releasedBefore, developer, publisher, genres
         );
         List<Game> foundGames = gameService.search(params);
+        foundGames = sortHelper.sortGames(foundGames, sortBy, sortReverse);
         List<NormalGameDTO> allGameDTOs = foundGames.stream()
                 .map(NormalGameDTO::new).toList();
         return new PaginatedResponse<NormalGameDTO>(200, allGameDTOs, pageNr,perPage);
