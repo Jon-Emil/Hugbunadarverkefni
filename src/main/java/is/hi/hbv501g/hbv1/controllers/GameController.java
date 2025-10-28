@@ -7,13 +7,19 @@ import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
+import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
+import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -28,6 +34,7 @@ public class GameController {
     private final UserService userService;
     private final JWTHelper jwtHelper;
     private final SortHelper sortHelper;
+    private final GenreService genreService;
 
     @Autowired
     public GameController(
@@ -35,11 +42,13 @@ public class GameController {
             UserService userService,
             JWTHelper jwtHelper,
             SortHelper sortHelper
+            GenreService genreService
     ) {
         this.gameService = gameService;
         this.userService = userService;
         this.jwtHelper = jwtHelper;
         this.sortHelper = sortHelper;
+        this.genreService = genreService;
     }
 
     /**
@@ -386,5 +395,36 @@ public class GameController {
         } catch( IllegalArgumentException error ) {
             return ResponseEntity.badRequest().body(error.getMessage());
         }
+    }
+
+    @GetMapping("/games/genre/{genreId}")
+    public PaginatedResponse<NormalGameDTO> listGamesByGenreId(
+            @PathVariable Long genreId,
+            @RequestParam(defaultValue = "1") int pageNr,
+            @RequestParam(defaultValue = "10") int perPage
+    ) {
+        Genre genre = genreService.findById(genreId);
+        if (genre == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND, "Genre not found");
+        }
+
+        List<Game> allGames = genre.getGames();
+        if (allGames == null) allGames = List.of();
+
+        allGames.sort(Comparator.comparing((Game g) -> {
+            String t = g.getTitle();
+            return t == null ? "" : t.toLowerCase();
+        }).thenComparing(g -> g.getTitle() == null ? "" : g.getTitle())
+                .thenComparingLong(Game::getId));
+
+        int page = Math.max(pageNr, 1);
+        int per  = Math.max(perPage, 1);
+        int from = Math.min((page - 1) * per, allGames.size());
+        int to   = Math.min(from + per, allGames.size());
+
+        List<NormalGameDTO> pageDTOs = allGames.subList(from, to).stream().map(NormalGameDTO::new).toList();
+
+        return new PaginatedResponse<>(200, pageDTOs, page, per);
     }
 }

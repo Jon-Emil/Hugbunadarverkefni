@@ -12,8 +12,11 @@ import is.hi.hbv501g.hbv1.services.GameService;
 import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -182,7 +185,7 @@ public class GameServiceImplementation implements GameService {
     @Override
     @Transactional
     public Review postReview(User user, Game game, Review incomingReview) {
-        Optional<Review> existingReview = reviewRepository.findByGameAndUser(game, user);;
+        Optional<Review> existingReview = reviewRepository.findByGameAndUser(game, user);
 
         if (existingReview.isPresent()) {
             throw new IllegalArgumentException("Review already exists for this user and game");
