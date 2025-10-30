@@ -208,6 +208,14 @@ public class UserController {
         }
     }
 
+    /**
+     * a method that allows the user to follow another user
+     *
+     * @param userID user to follow
+     * @param authHeader the header that contains the session token
+     *
+     * @return a response entity with a status code and a message that will tell the user how the request went
+     */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.POST)
     public ResponseEntity<String> followUser(
             @PathVariable("userID") Long userID,
@@ -234,6 +242,14 @@ public class UserController {
         }
     }
 
+    /**
+     * a method that allows the user to unfollow another user
+     *
+     * @param userID user to unfollow
+     * @param authHeader the header that contains the session token
+     *
+     * @return a response entity with a status code and a message that will tell the user how the request went
+     */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.DELETE)
     public ResponseEntity<String> unfollowUser(
             @PathVariable("userID") Long userID,
