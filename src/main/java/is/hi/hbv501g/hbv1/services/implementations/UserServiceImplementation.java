@@ -213,4 +213,35 @@ public class UserServiceImplementation implements UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
         return new NormalUserDTO(user);
     }
+
+    @Override
+    @Transactional
+    public void addFollow(User user, User userToFollow) {
+        if (user.equals(userToFollow)) {
+            throw new IllegalArgumentException("Users cannot follow themselves");
+        }
+        if (user.getFollows().contains(userToFollow)) {
+            throw new IllegalArgumentException("Connection already exists");
+        }
+
+        user.getFollows().add(userToFollow);
+        userToFollow.getFollowedBy().add(user);
+
+        userRepository.save(user);
+        userRepository.save(userToFollow);
+    }
+
+    @Override
+    @Transactional
+    public void removeFollow(User user, User userToUnfollow) {
+        if (!user.getFollows().contains(userToUnfollow)) {
+            throw new IllegalArgumentException("Connection does not exist");
+        }
+
+        user.getFollows().remove(userToUnfollow);
+        userToUnfollow.getFollowedBy().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(userToUnfollow);
+    }
 }

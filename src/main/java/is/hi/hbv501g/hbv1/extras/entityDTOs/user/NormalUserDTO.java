@@ -43,6 +43,10 @@ public class NormalUserDTO {
                 .map(ReferencedGameDTO::new).toList();
         this.hasPlayed = user.getHasPlayed().stream()
                 .map(ReferencedGameDTO::new).toList();
+        this.follows = user.getFollows().stream()
+                .map(ReferencedUserDTO::new).toList();
+        this.followedBy = user.getFollowedBy().stream()
+                .map(ReferencedUserDTO::new).toList();
         this.reviews = user.getReviews().stream()
                 .map(ReferencedReviewDTO::new).toList();
     }

@@ -10,6 +10,7 @@ import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.UserToUpdate;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
+import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
@@ -37,6 +38,26 @@ public class UserController {
         this.jwtHelper = jwtHelper;
         this.cloudinaryService = cloudinaryService;
         this.sortHelper = sortHelper;
+    }
+
+    /**
+     * Helper function used to easily get the User from the userID stored in the Auth header
+     *
+     * @param authHeader Where the token is stored
+     * @param userNotFoundError What we want the error message to be if we don't find a user matching the userID
+     *
+     * @return User object of the userID that is stored in the header
+     */
+    private User extractUserFromHeader(String authHeader, String userNotFoundError) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new JwtException("Missing or malformed Authorization header");
+        }
+
+        String token = authHeader.substring(7); // safer than replace()
+        Long userId = jwtHelper.extractUserId(token);
+        User user = userService.findById(userId);
+        if (user == null) throw new JwtException(userNotFoundError);
+        return user;
     }
 
     /**
@@ -183,11 +204,72 @@ public class UserController {
         }
     }
 
+    /**
+     * a method that allows the user to follow another user
+     *
+     * @param userID user to follow
+     * @param authHeader the header that contains the session token
+     *
+     * @return a response entity with a status code and a message that will tell the user how the request went
+     */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.POST)
     public ResponseEntity<String> followUser(
+            @PathVariable("userID") Long userID,
+            @RequestHeader(value = "Authorization") String authHeader
+    ) {
+        User user;
+        try {
+            user = extractUserFromHeader(authHeader, "You must be logged in to follow another user");
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
 
-    ){
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Not implemented");
+        User userToFollow = userService.findById(userID);
+
+        if (userToFollow == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User to follow not found");
+        }
+
+        try {
+            userService.addFollow(user, userToFollow);
+            return ResponseEntity.ok().body("User: [" + user.getId() + "] followed user: [" + userID + "]");
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(error.getMessage());
+        }
+    }
+
+    /**
+     * a method that allows the user to unfollow another user
+     *
+     * @param userID user to unfollow
+     * @param authHeader the header that contains the session token
+     *
+     * @return a response entity with a status code and a message that will tell the user how the request went
+     */
+    @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.DELETE)
+    public ResponseEntity<String> unfollowUser(
+            @PathVariable("userID") Long userID,
+            @RequestHeader(value = "Authorization") String authHeader
+    ) {
+        User user;
+        try {
+            user = extractUserFromHeader(authHeader, "You must be logged in to unfollow another user");
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+
+        User userToUnfollow = userService.findById(userID);
+
+        if (userToUnfollow == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User to unfollow not found");
+        }
+
+        try {
+            userService.removeFollow(user, userToUnfollow);
+            return ResponseEntity.ok().body("User: [" + user.getId() + "] unfollowed user: [" + userID + "]");
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(error.getMessage());
+        }
     }
 
 
