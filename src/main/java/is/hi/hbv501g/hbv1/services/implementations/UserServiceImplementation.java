@@ -49,12 +49,11 @@ public class UserServiceImplementation implements UserService {
      * finds a user by their username
      *
      * @param username the username of the user we want to find
-     *
      * @return the first user found
      */
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).getFirst();
+    public List<User> findByUsernameContaining(String username) {
+        return userRepository.findByUsernameContainingIgnoreCase(username);
     }
 
     /**

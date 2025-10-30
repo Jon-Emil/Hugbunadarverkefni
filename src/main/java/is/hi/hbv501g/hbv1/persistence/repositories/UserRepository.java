@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User save(User user);
-    List<User> findByUsername(String username);
+    List<User> findByUsernameContainingIgnoreCase(String username);
     User findByEmail(String email);
     User findById(long id);
     List<User> findAll();
