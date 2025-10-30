@@ -214,6 +214,12 @@ public class UserServiceImplementation implements UserService {
         return new NormalUserDTO(user);
     }
 
+    /**
+     * makes a user follow the userToFollow
+     *
+     * @param user the user that wants to follow the other user
+     * @param userToFollow the user the main user wants to follow
+     */
     @Override
     @Transactional
     public void addFollow(User user, User userToFollow) {
@@ -231,6 +237,12 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(userToFollow);
     }
 
+    /**
+     * makes a user unfollow the userToUnfollow
+     *
+     * @param user the user that wants to unfollow the other user
+     * @param userToUnfollow the user the main user wants to unfollow
+     */
     @Override
     @Transactional
     public void removeFollow(User user, User userToUnfollow) {
