@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews",uniqueConstraints = @UniqueConstraint(columnNames = {"user-id", "game-id"}))
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -177,7 +177,7 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.getPublicProfileById(userId));
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No user not found with this user id.");
         }
     }
 
