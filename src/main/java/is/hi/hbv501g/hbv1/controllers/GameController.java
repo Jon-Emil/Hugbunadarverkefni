@@ -95,7 +95,7 @@ public class GameController {
         // convert to DTOs
         List<NormalGameDTO> allGameDTOs = allGames.stream()
                 .map(NormalGameDTO::new).toList();
-        return new PaginatedResponse<NormalGameDTO>(200, allGameDTOs, pageNr,perPage);
+        return new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr,perPage);
     }
 
     @RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET)
@@ -145,7 +145,7 @@ public class GameController {
         foundGames = sortHelper.sortGames(foundGames, sortBy, sortReverse);
         List<NormalGameDTO> allGameDTOs = foundGames.stream()
                 .map(NormalGameDTO::new).toList();
-        return new PaginatedResponse<NormalGameDTO>(200, allGameDTOs, pageNr,perPage);
+        return new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage);
     }
 
     /**
@@ -220,7 +220,7 @@ public class GameController {
 
         try {
             userService.addFavorite(user, game);
-            return new NormalResponse<>(HttpStatus.OK.value(), "[" + user.getId() + "] added game: [" + gameID + "] as a favorite");
+            return new NormalResponse<>(HttpStatus.OK.value(), "[" + user.getId() + "] added game: [" + gameID + "] as a favorite", new NormalGameDTO(game));
         } catch( IllegalArgumentException error ) {
             return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
@@ -254,7 +254,7 @@ public class GameController {
 
         try {
             userService.addWantToPlay(user, game);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] added game: [" + gameID + "] as a game they want to play");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] added game: [" + gameID + "] as a game they want to play", new NormalGameDTO(game));
         } catch( IllegalArgumentException error ) {
             return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
@@ -288,7 +288,7 @@ public class GameController {
 
         try {
             userService.addHasPlayed(user, game);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] added game: [" + gameID + "] as a game they have played");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] added game: [" + gameID + "] as a game they have played", new NormalGameDTO(game));
         } catch( IllegalArgumentException error ) {
             return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
@@ -322,7 +322,7 @@ public class GameController {
 
         try {
             userService.removeFavorite(user, game);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a favorite");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a favorite", new NormalGameDTO(game));
         } catch( IllegalArgumentException error ) {
             return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
@@ -356,7 +356,7 @@ public class GameController {
 
         try {
             userService.removeWantToPlay(user, game);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they want to play");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they want to play", new NormalGameDTO(game));
         } catch( IllegalArgumentException error ) {
             return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
@@ -390,7 +390,7 @@ public class GameController {
 
         try {
             userService.removeHasPlayed(user, game);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they have played");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they have played", new NormalGameDTO(game));
         } catch( IllegalArgumentException error ) {
             return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }

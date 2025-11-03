@@ -1,11 +1,10 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
-import is.hi.hbv501g.hbv1.extras.DTOs.GenreToCreate;
-import is.hi.hbv501g.hbv1.extras.DTOs.GenreToUpdate;
+import is.hi.hbv501g.hbv1.extras.DTOs.*;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.NormalGenreDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
-import is.hi.hbv501g.hbv1.extras.DTOs.GameToCreate;
-import is.hi.hbv501g.hbv1.extras.DTOs.GameToUpdate;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
@@ -58,7 +57,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/addGame", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)
-    public ResponseEntity<String> addGame(
+    public NormalResponse<NormalGameDTO> addGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestPart("game") GameToCreate gameToCreate,
             BindingResult res,
@@ -73,18 +72,17 @@ public class AdminController {
 
             //Verify user is ADMIN
             if (user == null || user.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to add a game");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to add a game");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         //Check validation of Game details
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors);
         }
 
 
@@ -100,9 +98,9 @@ public class AdminController {
                 gameToCreate.getPublisher(),
                 gameToCreate.getDeveloper()
                 );
-        gameService.add(game, gameToCreate.getGenreIds());
+        Game newGame = gameService.add(game, gameToCreate.getGenreIds());
 
-        return ResponseEntity.ok("Game added!");
+        return new NormalResponse<>(HttpStatus.CREATED.value(), "Game added!", new NormalGameDTO(newGame));
     }
 
     /**
@@ -114,7 +112,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "admin/deleteUser/{userID}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteLoggedInUser(
+    public NormalResponse<Void> deleteUser(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long userID
     ) {
@@ -126,21 +124,20 @@ public class AdminController {
             admin = userService.findById(userId);
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to delete an account");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to delete an account");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         User user = userService.findById(userID);
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "User not found");
         }
 
         userService.delete(user);
-        return ResponseEntity.ok().body("Successfully deleted user with id: " + user.getId());
+        return new NormalResponse<>(HttpStatus.OK.value(), "Successfully deleted user with id: " + user.getId());
     }
 
     /**
@@ -155,7 +152,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/updateGame/{gameID}", method = RequestMethod.PATCH)
-    public ResponseEntity<String> updateGame(
+    public NormalResponse<NormalGameDTO> updateGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @Valid @RequestPart(value = "gameInfo", required = false) GameToUpdate gameInfo,
@@ -170,23 +167,22 @@ public class AdminController {
             admin = userService.findById(userId);
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to delete an account");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to update a game");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors);
         }
 
         if (coverImageFile != null) {
@@ -221,8 +217,8 @@ public class AdminController {
             }
         }
 
-        gameService.save(game);
-        return ResponseEntity.ok().body("Successfully updated game with id: " + gameID);
+        Game updatedGame = gameService.save(game);
+        return new NormalResponse<>(HttpStatus.OK.value(), "Successfully updated game with id: " + gameID, new NormalGameDTO(updatedGame));
     }
 
     /**
@@ -234,7 +230,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/deleteGame/{gameID}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteGame(
+    public NormalResponse<Void> deleteGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID
     ) {
@@ -246,21 +242,20 @@ public class AdminController {
             admin = userService.findById(userId);
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to delete a game");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to delete a game");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         gameService.delete(game);
-        return ResponseEntity.ok().body("Successfully deleted game with id: " + gameID);
+        return new NormalResponse<>(HttpStatus.OK.value(), "Successfully deleted game with id: " + gameID);
     }
 
     /**
@@ -272,7 +267,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/addGenre", method = RequestMethod.POST)
-    public ResponseEntity<String> addGenre(
+    public NormalResponse<NormalGenreDTO> addGenre(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestBody GenreToCreate genre,
             BindingResult res
@@ -284,28 +279,27 @@ public class AdminController {
             admin = userService.findById(userId);
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to add a genre");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to add a genre");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors);
         }
 
         if (genreService.findByTitle(genre.getTitle()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Genre already exists");
+            return new NormalResponse<>(HttpStatus.CONFLICT.value(), "Genre already exists");
         }
 
 
         Genre newGenre = new Genre(genre.getTitle(), genre.getDescription());
 
-        genreService.save(newGenre);
-        return ResponseEntity.ok("Genre added!");
+        Genre savedGenre = genreService.save(newGenre);
+        return new NormalResponse<>(HttpStatus.CREATED.value(), "Genre added!", new NormalGenreDTO(savedGenre));
     }
 
     /**
@@ -317,7 +311,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/updateGenre/{genreID}", method = RequestMethod.PATCH)
-    public ResponseEntity<String> updateGenre(
+    public NormalResponse<NormalGenreDTO> updateGenre(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestBody GenreToUpdate genre,
             BindingResult res,
@@ -330,23 +324,22 @@ public class AdminController {
             admin = userService.findById(userId);
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to update a genre");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to update a genre");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         Genre existingGenre = genreService.findById(genreID);
 
         if (existingGenre == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Genre not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Genre not found");
         }
 
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors);
         }
 
         if(genre.getTitle() != null){
@@ -356,8 +349,8 @@ public class AdminController {
             existingGenre.setDescription(genre.getDescription());
         }
 
-        genreService.save(existingGenre);
-        return ResponseEntity.ok("Genre successfully updated with id : " + genreID);
+        Genre savedGenre = genreService.save(existingGenre);
+        return new NormalResponse<>(HttpStatus.CREATED.value(), "Genre successfully updated with id : " + genreID, new NormalGenreDTO(savedGenre));
     }
 
     /**
@@ -369,7 +362,7 @@ public class AdminController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "admin/deleteGenre/{genreID}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteGenre(
+    public NormalResponse<Void> deleteGenre(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long genreID
     ) {
@@ -380,20 +373,19 @@ public class AdminController {
             admin = userService.findById(userId);
 
             if (admin == null || admin.getRole() != Role.ADMIN) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("You must be an admin to delete a genre");
+                return new NormalResponse<>(HttpStatus.FORBIDDEN.value(), "You must be an admin to delete a genre");
             }
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
         }
 
         Genre genre = genreService.findById(genreID);
 
         if (genre == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Genre does not exist");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Genre does not exist");
         }
 
         genreService.delete(genre);
-        return ResponseEntity.ok().body("Successfully deleted genre with id: " + genreID);
+        return new NormalResponse<>(HttpStatus.OK.value(), "Successfully deleted genre with id: " + genreID);
     }
 }

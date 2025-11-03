@@ -7,6 +7,7 @@ import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
@@ -48,7 +49,7 @@ public class GenreController {
                 .map(NormalGenreDTO::new)
                 .toList();
 
-        return new PaginatedResponse<>(200, allGenresDTOs, pageNr, perPage);
+        return new PaginatedResponse<>(HttpStatus.OK.value(), allGenresDTOs, pageNr, perPage);
     }
 
     // not finished
