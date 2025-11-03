@@ -1,7 +1,9 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
@@ -160,7 +162,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
-    public ResponseEntity<String> postReview(
+    public NormalResponse<NormalReviewDTO> postReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @Valid @RequestBody Review incomingReview,
@@ -169,27 +171,27 @@ public class GameController {
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return new NormalResponse<>(400, errors);
         }
 
         User user;
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to add a review");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(401, e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(404, "Game not found");
         }
 
         try {
-            gameService.postReview(user, game, incomingReview);
-            return ResponseEntity.ok().body("Review successfully added to game with id: " + gameID);
+            Review newReview = gameService.postReview(user, game, incomingReview);
+            return new NormalResponse<>(201, "Review successfully added to game with id: " + gameID, new NormalReviewDTO(newReview));
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(400, error.getMessage());
         }
     }
 
