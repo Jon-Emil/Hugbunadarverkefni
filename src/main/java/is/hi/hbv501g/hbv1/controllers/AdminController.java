@@ -349,10 +349,15 @@ public class AdminController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        Genre updatedGenre = new Genre(genre.getTitle(), genre.getDescription());
+        if(genre.getTitle() != null){
+            existingGenre.setTitle(genre.getTitle());
+        }
+        if(genre.getDescription() != null){
+            existingGenre.setDescription(genre.getDescription());
+        }
 
-        genreService.save(updatedGenre);
-        return ResponseEntity.ok("Genre"+ existingGenre.getTitle() +" updated to " +  updatedGenre.getTitle());
+        genreService.save(existingGenre);
+        return ResponseEntity.ok("Genre successfully updated with id : " + genreID);
     }
 
     /**
