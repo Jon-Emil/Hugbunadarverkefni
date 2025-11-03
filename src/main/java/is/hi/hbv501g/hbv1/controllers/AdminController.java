@@ -1,6 +1,8 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.DTOs.GenreToCreate;
+import is.hi.hbv501g.hbv1.extras.DTOs.GenreToUpdate;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.DTOs.GameToCreate;
 import is.hi.hbv501g.hbv1.extras.DTOs.GameToUpdate;
@@ -52,7 +54,7 @@ public class AdminController {
      * @param gameToCreate Information about the game that is being created
      * @param res the BindingResults of the gameToCreate which just tell us if the gameToCreate conforms to the rules it has
      * @param coverImageFile The image file that will become the cover for this new game
-     *                       
+     *
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/addGame", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)
@@ -101,15 +103,6 @@ public class AdminController {
         gameService.add(game, gameToCreate.getGenreIds());
 
         return ResponseEntity.ok("Game added!");
-    }
-
-    // not finished
-    @RequestMapping(value = "/admin/addGenre", method = RequestMethod.POST)
-    public ResponseEntity<String> addGenre(@RequestBody Genre genre) {
-
-        //NEEDS ADMIN VERIFICATION
-        genreService.save(genre);
-        return ResponseEntity.ok("Genre added!");
     }
 
     /**
@@ -268,6 +261,98 @@ public class AdminController {
 
         gameService.delete(game);
         return ResponseEntity.ok().body("Successfully deleted game with id: " + gameID);
+    }
+
+    /**
+     * A method that allows the admin to add a genre to the system
+     *
+     * @param authHeader the header where the session token is stored
+     * @param genre genre information to be saved
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
+    @RequestMapping(value = "/admin/addGenre", method = RequestMethod.POST)
+    public ResponseEntity<String> addGenre(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @Valid @RequestBody GenreToCreate genre,
+            BindingResult res
+    ) {
+        User admin;
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            admin = userService.findById(userId);
+
+            if (admin == null || admin.getRole() != Role.ADMIN) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("You must be an admin to add a genre");
+            }
+        }catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
+
+        if (res.hasErrors()) {
+            String errors = res.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        if (genreService.findByTitle(genre.getTitle()) != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Genre already exists");
+        }
+
+
+        Genre newGenre = new Genre(genre.getTitle(), genre.getDescription());
+
+        genreService.save(newGenre);
+        return ResponseEntity.ok("Genre added!");
+    }
+
+    /**
+     * A method that allows the admin to update a genre in the system
+     *
+     * @param authHeader the header where the session token is stored
+     * @param genre genre information to be updated
+     *
+     * @return a response entity with a status code and a message that should tell the user how this request went
+     */
+    @RequestMapping(value = "/admin/updateGenre/{genreID}", method = RequestMethod.PATCH)
+    public ResponseEntity<String> updateGenre(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @Valid @RequestBody GenreToUpdate genre,
+            BindingResult res,
+            @PathVariable Long genreID
+    ) {
+        User admin;
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Long userId = jwtHelper.extractUserId(token);
+            admin = userService.findById(userId);
+
+            if (admin == null || admin.getRole() != Role.ADMIN) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("You must be an admin to update a genre");
+            }
+        }catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
+
+        Genre existingGenre = genreService.findById(genreID);
+
+        if (existingGenre == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Genre not found");
+        }
+
+        if (res.hasErrors()) {
+            String errors = res.getAllErrors().stream()
+                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        Genre updatedGenre = new Genre(genre.getTitle(), genre.getDescription());
+
+        genreService.save(updatedGenre);
+        return ResponseEntity.ok("Genre"+ existingGenre.getTitle() +" updated to " +  updatedGenre.getTitle());
     }
 
     /**

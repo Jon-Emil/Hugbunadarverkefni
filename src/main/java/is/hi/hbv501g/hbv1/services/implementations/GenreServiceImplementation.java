@@ -50,7 +50,7 @@ public class GenreServiceImplementation implements GenreService {
     @Override
     public Genre findByTitle(String title) {
         //Should fix get first to return list if many genres have same title
-        return genreRepository.findByTitle(title).getFirst();
+        return genreRepository.findByTitleIgnoreCase(title).getFirst();
     }
 
     /**

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 public interface GenreRepository extends JpaRepository<Genre, Long> {
     Genre save(Genre genre);
-    List<Genre> findByTitle(String title);
+    List<Genre> findByTitleIgnoreCase(String title);
     Genre findById(long id);
     List<Genre> findAll();
     void delete(Genre genre);
