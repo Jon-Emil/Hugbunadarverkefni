@@ -12,7 +12,6 @@ import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 
 import is.hi.hbv501g.hbv1.persistence.entities.User;
@@ -21,9 +20,7 @@ import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -171,27 +168,27 @@ public class GameController {
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return new NormalResponse<>(400, errors);
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors);
         }
 
         User user;
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to add a review");
         }catch (JwtException e){
-            return new NormalResponse<>(401, e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return new NormalResponse<>(404, "Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             Review newReview = gameService.postReview(user, game, incomingReview);
-            return new NormalResponse<>(201, "Review successfully added to game with id: " + gameID, new NormalReviewDTO(newReview));
+            return new NormalResponse<NormalReviewDTO>(HttpStatus.CREATED.value(), "Review successfully added to game with id: " + gameID, new NormalReviewDTO(newReview));
         } catch( IllegalArgumentException error ) {
-            return new NormalResponse<>(400, error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
@@ -204,7 +201,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/favorite", method = RequestMethod.POST)
-    public ResponseEntity<String> addFavorite(
+    public NormalResponse<NormalGameDTO> addFavorite(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -212,20 +209,20 @@ public class GameController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to add a game as your favorite");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             userService.addFavorite(user, game);
-            return ResponseEntity.ok().body("User: [" + user.getId() + "] added game: [" + gameID + "] as a favorite");
+            return new NormalResponse<>(HttpStatus.OK.value(), "[" + user.getId() + "] added game: [" + gameID + "] as a favorite");
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
@@ -238,7 +235,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/wants", method = RequestMethod.POST)
-    public ResponseEntity<String> addWantToPlay(
+    public NormalResponse<NormalGameDTO> addWantToPlay(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -246,20 +243,20 @@ public class GameController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to add a game as a game you want to play");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             userService.addWantToPlay(user, game);
-            return ResponseEntity.ok().body("User: [" + user.getId() + "] added game: [" + gameID + "] as a game they want to play");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] added game: [" + gameID + "] as a game they want to play");
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
@@ -272,7 +269,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/played", method = RequestMethod.POST)
-    public ResponseEntity<String> addHasPlayed(
+    public NormalResponse<NormalGameDTO> addHasPlayed(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -280,20 +277,20 @@ public class GameController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to add a game as a game you have played");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             userService.addHasPlayed(user, game);
-            return ResponseEntity.ok().body("User: [" + user.getId() + "] added game: [" + gameID + "] as a game they have played");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] added game: [" + gameID + "] as a game they have played");
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
@@ -306,7 +303,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/favorite", method = RequestMethod.DELETE)
-    public ResponseEntity<String> removeFavorite(
+    public NormalResponse<NormalGameDTO> removeFavorite(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -314,20 +311,20 @@ public class GameController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to remove a game as your favorite");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             userService.removeFavorite(user, game);
-            return ResponseEntity.ok().body("User: [" + user.getId() + "] removed game: [" + gameID + "] as a favorite");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a favorite");
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
@@ -340,7 +337,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/wants", method = RequestMethod.DELETE)
-    public ResponseEntity<String> removeWantToPlay(
+    public NormalResponse<NormalGameDTO> removeWantToPlay(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -348,20 +345,20 @@ public class GameController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to remove a game as a game you want to play");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             userService.removeWantToPlay(user, game);
-            return ResponseEntity.ok().body("User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they want to play");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they want to play");
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
@@ -374,7 +371,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/played", method = RequestMethod.DELETE)
-    public ResponseEntity<String> removeHasPlayed(
+    public NormalResponse<NormalGameDTO> removeHasPlayed(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -382,20 +379,20 @@ public class GameController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to remove a game as a game you have played");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found");
         }
 
         try {
             userService.removeHasPlayed(user, game);
-            return ResponseEntity.ok().body("User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they have played");
+            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] removed game: [" + gameID + "] as a game they have played");
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
         }
     }
 
