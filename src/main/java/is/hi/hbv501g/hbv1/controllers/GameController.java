@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
@@ -59,7 +60,7 @@ public class GameController extends BaseController {
      * and all available games sorted by their title alphabetically of the page requested
      */
     @RequestMapping(value = "/games", method = RequestMethod.GET)
-    public ResponseEntity<PaginatedResponse<NormalGameDTO>> allGames(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> allGames(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
@@ -78,7 +79,7 @@ public class GameController extends BaseController {
     }
 
     @RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> gameDetails(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> gameDetails(
             @PathVariable("gameID") Long gameID
     ) {
         Game game = gameService.findById(gameID);
@@ -103,7 +104,7 @@ public class GameController extends BaseController {
      * and all available games that fit the criteria in the page that was requested
      */
     @RequestMapping(value = "/games/search", method = RequestMethod.GET)
-    public ResponseEntity<PaginatedResponse<NormalGameDTO>> gameSearch(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> gameSearch(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(required = false) String title,
@@ -138,7 +139,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalReviewDTO>> postReview(
+    public ResponseEntity<BaseResponse<NormalReviewDTO>> postReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @Valid @RequestBody Review incomingReview,
@@ -180,7 +181,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/favorite", method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> addFavorite(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> addFavorite(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -214,7 +215,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/wants", method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> addWantToPlay(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> addWantToPlay(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -248,7 +249,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/played", method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> addHasPlayed(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> addHasPlayed(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -282,7 +283,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/favorite", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> removeFavorite(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> removeFavorite(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -316,7 +317,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/wants", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> removeWantToPlay(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> removeWantToPlay(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -350,7 +351,7 @@ public class GameController extends BaseController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/played", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> removeHasPlayed(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> removeHasPlayed(
             @PathVariable("gameID") Long gameID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -375,9 +376,9 @@ public class GameController extends BaseController {
         }
     }
 
-    @GetMapping("/games/genre/{genreId}")
-    public ResponseEntity<PaginatedResponse<NormalGameDTO>> listGamesByGenreId(
-            @PathVariable Long genreId,
+    @RequestMapping(value = "/games/genre/{genreId}", method = RequestMethod.GET)
+    public ResponseEntity<BaseResponse<NormalGameDTO>> listGamesByGenreId(
+            @PathVariable("genreId") Long genreId,
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
@@ -398,5 +399,27 @@ public class GameController extends BaseController {
         List<NormalGameDTO> allGameDTOs = allGames.stream()
                 .map(NormalGameDTO::new).toList();
         return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
+    }
+
+    @RequestMapping(value = "/games/{gameID}/reviews")
+    public ResponseEntity<BaseResponse<NormalReviewDTO>> seeGamesReviews(
+            @PathVariable("gameID") Long gameID,
+            @RequestParam(defaultValue = "1") int pageNr,
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "false") Boolean sortReverse
+    ) {
+        Game game = gameService.findById(gameID);
+
+        if (game == null) {
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found"));
+        }
+
+        List<Review> allReviews = game.getReviews();
+        allReviews = sortHelper.sortReviews(allReviews, sortBy, sortReverse);
+
+        List<NormalReviewDTO> allGameDTOs = allReviews.stream()
+                .map(NormalReviewDTO::new).toList();
+        return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allGameDTOs, pageNr,perPage));
     }
 }

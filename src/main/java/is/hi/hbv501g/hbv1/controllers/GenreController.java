@@ -1,5 +1,6 @@
 package is.hi.hbv501g.hbv1.controllers;
 
+import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.NormalGenreDTO;
@@ -35,7 +36,7 @@ public class GenreController extends BaseController {
      * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
      */
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
-    public ResponseEntity<PaginatedResponse<NormalGenreDTO>> allGenres(
+    public ResponseEntity<BaseResponse<NormalGenreDTO>> allGenres(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
@@ -60,7 +61,7 @@ public class GenreController extends BaseController {
      * @return a response entity containing a http code and a message about how the request went
      */
     @RequestMapping(value = "/genres/{genreID}", method = RequestMethod.GET)
-    public ResponseEntity<NormalResponse<NormalGenreDTO>> genreDetails(@PathVariable Long genreID) {
+    public ResponseEntity<BaseResponse<NormalGenreDTO>> genreDetails(@PathVariable Long genreID) {
         Genre genre = genreService.findById(genreID);
 
         if (genre == null) {

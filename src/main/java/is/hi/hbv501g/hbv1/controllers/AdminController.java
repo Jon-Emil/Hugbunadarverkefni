@@ -55,7 +55,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/addGame", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> addGame(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> addGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestPart("game") GameToCreate gameToCreate,
             BindingResult res,
@@ -101,7 +101,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "admin/deleteUser/{userID}", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<Void>> deleteUser(
+    public ResponseEntity<BaseResponse<Void>> deleteUser(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long userID
     ) {
@@ -133,7 +133,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/updateGame/{gameID}", method = RequestMethod.PATCH)
-    public ResponseEntity<NormalResponse<NormalGameDTO>> updateGame(
+    public ResponseEntity<BaseResponse<NormalGameDTO>> updateGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @Valid @RequestPart(value = "gameInfo", required = false) GameToUpdate gameInfo,
@@ -203,7 +203,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/deleteGame/{gameID}", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<Void>> deleteGame(
+    public ResponseEntity<BaseResponse<Void>> deleteGame(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID
     ) {
@@ -232,7 +232,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/addGenre", method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalGenreDTO>> addGenre(
+    public ResponseEntity<BaseResponse<NormalGenreDTO>> addGenre(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestBody GenreToCreate genre,
             BindingResult res
@@ -269,7 +269,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "/admin/updateGenre/{genreID}", method = RequestMethod.PATCH)
-    public ResponseEntity<NormalResponse<NormalGenreDTO>> updateGenre(
+    public ResponseEntity<BaseResponse<NormalGenreDTO>> updateGenre(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestBody GenreToUpdate genre,
             BindingResult res,
@@ -313,7 +313,7 @@ public class AdminController extends BaseController {
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value = "admin/deleteGenre/{genreID}", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<Void>> deleteGenre(
+    public ResponseEntity<BaseResponse<Void>> deleteGenre(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long genreID
     ) {

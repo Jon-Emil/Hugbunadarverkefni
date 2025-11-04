@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.MyselfUserDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.NormalUserDTO;
@@ -43,7 +44,7 @@ public class UserController extends BaseController{
      * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity<PaginatedResponse<NormalUserDTO>> allUsers(
+    public ResponseEntity<BaseResponse<NormalUserDTO>> allUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -64,7 +65,7 @@ public class UserController extends BaseController{
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<Void>> deleteLoggedInUser(
+    public ResponseEntity<BaseResponse<Void>> deleteLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader
     ) {
         User user;
@@ -88,7 +89,7 @@ public class UserController extends BaseController{
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users", method = RequestMethod.PATCH)
-    public ResponseEntity<NormalResponse<NormalUserDTO>> changeLoggedInUser(
+    public ResponseEntity<BaseResponse<NormalUserDTO>> changeLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestPart(value = "userInfo", required = false) UserToUpdate userInfo,
             BindingResult res,
@@ -133,7 +134,7 @@ public class UserController extends BaseController{
      * @return response entity with either the users info or an error message
      */
     @GetMapping("/users/{userId}")
-    public ResponseEntity<NormalResponse<NormalUserDTO>> getPublicProfileById(@PathVariable("userId") Long userId) {
+    public ResponseEntity<BaseResponse<NormalUserDTO>> getPublicProfileById(@PathVariable("userId") Long userId) {
 
         User user = userService.findById(userId);
 
@@ -151,7 +152,7 @@ public class UserController extends BaseController{
      * @return a response entity with the info of the user that is logged in or an error message
      */
     @GetMapping("/users/profile")
-    public ResponseEntity<NormalResponse<MyselfUserDTO>> getOwnProfile(
+    public ResponseEntity<BaseResponse<MyselfUserDTO>> getOwnProfile(
             @RequestHeader("Authorization") String authHeader
     ) {
         User user;
@@ -173,7 +174,7 @@ public class UserController extends BaseController{
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.POST)
-    public ResponseEntity<NormalResponse<NormalUserDTO>> followUser(
+    public ResponseEntity<BaseResponse<NormalUserDTO>> followUser(
             @PathVariable("userID") Long userID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -207,7 +208,7 @@ public class UserController extends BaseController{
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.DELETE)
-    public ResponseEntity<NormalResponse<NormalUserDTO>> unfollowUser(
+    public ResponseEntity<BaseResponse<NormalUserDTO>> unfollowUser(
             @PathVariable("userID") Long userID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -246,7 +247,7 @@ public class UserController extends BaseController{
      * and a list of all users that match the search.
      */
     @RequestMapping(value = "/users/search", method = RequestMethod.GET)
-    public ResponseEntity<PaginatedResponse<NormalUserDTO>> searchUsers(
+    public ResponseEntity<BaseResponse<NormalUserDTO>> searchUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam String username,

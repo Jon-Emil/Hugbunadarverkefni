@@ -1,5 +1,6 @@
 package is.hi.hbv501g.hbv1.controllers;
 
+import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.Credentials;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
@@ -33,7 +34,7 @@ public class AuthController extends BaseController{
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value="/login", method=RequestMethod.POST)
-    public ResponseEntity<NormalResponse<String>> login(@RequestBody Credentials credentials) {
+    public ResponseEntity<BaseResponse<String>> login(@RequestBody Credentials credentials) {
         if (credentials.getEmail() == null || credentials.getPassword() == null) {
             // incorrect password so return a 401 error
             return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid credentials"));
@@ -63,7 +64,7 @@ public class AuthController extends BaseController{
      * @return a response entity with a status code and a message that should tell the user how this request went
      */
     @RequestMapping(value="/register", method=RequestMethod.POST)
-    public ResponseEntity<NormalResponse<String>> register(@RequestBody Credentials credentials) {
+    public ResponseEntity<BaseResponse<String>> register(@RequestBody Credentials credentials) {
         User user = authService.findByEmail(credentials.getEmail());
         if (user != null) {
             // if there already is an account with this email then return a 409 error

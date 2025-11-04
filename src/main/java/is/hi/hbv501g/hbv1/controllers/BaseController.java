@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
@@ -14,24 +15,13 @@ public abstract class BaseController {
     protected JWTHelper jwtHelper;
 
     /**
-     * a wrapper function for the NormalResponse object that creates a response entity for it with the correct status
+     * a wrapper function for our response objects that creates a response entity for it with the correct status
      *
      * @param response The response object
-     * @return A response entity with the correct status that contains the NormalResponse object
+     * @return A response entity with the correct status that contains the response object
      * @param <T> The type of data that the response contains
      */
-    protected <T> ResponseEntity<NormalResponse<T>> wrap(NormalResponse<T> response) {
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    /**
-     * a wrapper function for the PaginatedResponse object that creates a response entity for it with the correct status
-     *
-     * @param response The response object
-     * @return A response entity with the correct status that contains the PaginatedResponse object
-     * @param <T> The type of data that the response contains
-     */
-    protected <T> ResponseEntity<PaginatedResponse<T>> wrap(PaginatedResponse<T> response) {
+    protected <T> ResponseEntity<BaseResponse<T>> wrap(BaseResponse<T> response) {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
