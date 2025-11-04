@@ -26,39 +26,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-public class UserController {
-    private final UserService userService;
-    private final JWTHelper jwtHelper;
+public class UserController extends BaseController{
     private final CloudinaryService cloudinaryService;
     private final SortHelper sortHelper;
 
 
     @Autowired
     public UserController(UserService userService, JWTHelper jwtHelper, CloudinaryService cloudinaryService, SortHelper sortHelper) {
-        this.userService = userService;
-        this.jwtHelper = jwtHelper;
+        this.setUserService(userService);
+        this.setJwtHelper(jwtHelper);
         this.cloudinaryService = cloudinaryService;
         this.sortHelper = sortHelper;
-    }
-
-    /**
-     * Helper function used to easily get the User from the userID stored in the Auth header
-     *
-     * @param authHeader Where the token is stored
-     * @param userNotFoundError What we want the error message to be if we don't find a user matching the userID
-     *
-     * @return User object of the userID that is stored in the header
-     */
-    private User extractUserFromHeader(String authHeader, String userNotFoundError) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new JwtException("Missing or malformed Authorization header");
-        }
-
-        String token = authHeader.substring(7); // safer than replace()
-        Long userId = jwtHelper.extractUserId(token);
-        User user = userService.findById(userId);
-        if (user == null) throw new JwtException(userNotFoundError);
-        return user;
     }
 
     /**
@@ -69,7 +47,7 @@ public class UserController {
      * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public PaginatedResponse<NormalUserDTO> allUsers(
+    public ResponseEntity<PaginatedResponse<NormalUserDTO>> allUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -79,7 +57,7 @@ public class UserController {
         allUsers = sortHelper.sortUsers(allUsers, sortBy, sortReverse);
         List<NormalUserDTO> allGameDTOs = allUsers.stream()
                 .map(NormalUserDTO::new).toList();
-        return new PaginatedResponse<NormalUserDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage);
+        return wrap(new PaginatedResponse<NormalUserDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
     }
 
     /**
@@ -90,7 +68,7 @@ public class UserController {
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users", method = RequestMethod.DELETE)
-    public NormalResponse<Void> deleteLoggedInUser(
+    public ResponseEntity<NormalResponse<Void>> deleteLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader
     ) {
         User user;
@@ -101,14 +79,14 @@ public class UserController {
             user = userService.findById(userId);
 
             if (user == null) {
-                return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "You must be logged in to delete your account");
+                return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "You must be logged in to delete your account"));
             }
         } catch (JwtException e) {
-            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token"));
         }
 
         userService.delete(user);
-        return new NormalResponse<>(HttpStatus.OK.value(), "Your account has been successfully deleted");
+        return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Your account has been successfully deleted"));
     }
 
     /**
@@ -121,7 +99,7 @@ public class UserController {
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users", method = RequestMethod.PATCH)
-    public NormalResponse<NormalUserDTO> changeLoggedInUser(
+    public ResponseEntity<NormalResponse<NormalUserDTO>> changeLoggedInUser(
             @RequestHeader(value = "Authorization") String authHeader,
             @Valid @RequestPart(value = "userInfo", required = false) UserToUpdate userInfo,
             BindingResult res,
@@ -135,16 +113,16 @@ public class UserController {
             user = userService.findById(userId);
 
             if (user == null) {
-                return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "You must be logged in to change your account");
+                return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "You must be logged in to change your account"));
             }
         } catch (JwtException e) {
-            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token"));
         }
 
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors);
+            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors));
         }
 
         if (profilePictureFile != null) {
@@ -163,7 +141,7 @@ public class UserController {
         }
 
         User savedUser = userService.save(user);
-        return new NormalResponse<>(HttpStatus.OK.value(), "Account information changed", new NormalUserDTO(savedUser));
+        return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Account information changed", new NormalUserDTO(savedUser)));
     }
 
     /**
@@ -173,12 +151,12 @@ public class UserController {
      * @return response entity with either the users info or an error message
      */
     @GetMapping("/users/id/{userId}")
-    public NormalResponse<NormalUserDTO> getPublicProfileById(@PathVariable("userId") Long userId) {
+    public ResponseEntity<NormalResponse<NormalUserDTO>> getPublicProfileById(@PathVariable("userId") Long userId) {
         try {
             NormalUserDTO user = userService.getPublicProfileById(userId);
-            return new NormalResponse<>(HttpStatus.OK.value(), "Found user", user);
+            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Found user", user));
         } catch (IllegalArgumentException ex) {
-            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "No user found with this user id.");
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "No user found with this user id."));
         }
     }
 
@@ -189,7 +167,7 @@ public class UserController {
      * @return a response entity with the info of the user that is logged in or an error message
      */
     @GetMapping("/users/me")
-    public NormalResponse<MyselfUserDTO> getOwnProfile(
+    public ResponseEntity<NormalResponse<MyselfUserDTO>> getOwnProfile(
             @RequestHeader("Authorization") String authHeader
     ) {
         try {
@@ -197,11 +175,11 @@ public class UserController {
             Long userId = jwtHelper.extractUserId(token);
             User me = userService.findById(userId);
             if (me == null) {
-                return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid user");
+                return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid user"));
             }
-            return new NormalResponse<>(HttpStatus.OK.value(), "Found profile", new MyselfUserDTO(me));
+            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Found profile", new MyselfUserDTO(me)));
         } catch (Exception e) {
-            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token");
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token"));
         }
     }
 
@@ -214,7 +192,7 @@ public class UserController {
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.POST)
-    public NormalResponse<NormalUserDTO> followUser(
+    public ResponseEntity<NormalResponse<NormalUserDTO>> followUser(
             @PathVariable("userID") Long userID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -222,20 +200,20 @@ public class UserController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to follow another user");
         } catch (JwtException e) {
-            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
 
         User userToFollow = userService.findById(userID);
 
         if (userToFollow == null) {
-            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "User to follow not found");
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "User to follow not found"));
         }
 
         try {
             userService.addFollow(user, userToFollow);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] followed user: [" + userID + "]");
+            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] followed user: [" + userID + "]"));
         } catch (IllegalArgumentException error) {
-            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage()));
         }
     }
 
@@ -248,7 +226,7 @@ public class UserController {
      * @return a response entity with a status code and a message that will tell the user how the request went
      */
     @RequestMapping(value = "/users/{userID}/follow", method = RequestMethod.DELETE)
-    public NormalResponse<NormalUserDTO> unfollowUser(
+    public ResponseEntity<NormalResponse<NormalUserDTO>> unfollowUser(
             @PathVariable("userID") Long userID,
             @RequestHeader(value = "Authorization") String authHeader
     ) {
@@ -256,20 +234,20 @@ public class UserController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to unfollow another user");
         } catch (JwtException e) {
-            return new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
 
         User userToUnfollow = userService.findById(userID);
 
         if (userToUnfollow == null) {
-            return new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "User to unfollow not found");
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "User to unfollow not found"));
         }
 
         try {
             userService.removeFollow(user, userToUnfollow);
-            return new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] unfollowed user: [" + userID + "]");
+            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "User: [" + user.getId() + "] unfollowed user: [" + userID + "]"));
         } catch (IllegalArgumentException error) {
-            return new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage()));
         }
     }
 
@@ -287,7 +265,7 @@ public class UserController {
      * and a list of all users that match the search.
      */
     @RequestMapping(value = "/users/search", method = RequestMethod.GET)
-    public PaginatedResponse<NormalUserDTO> searchUsers(
+    public ResponseEntity<PaginatedResponse<NormalUserDTO>> searchUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam String username,
@@ -299,6 +277,6 @@ public class UserController {
 
         List<NormalUserDTO> displayList = foundUsers.stream()
                 .map(NormalUserDTO::new).toList();
-        return new PaginatedResponse<NormalUserDTO>(HttpStatus.OK.value(), displayList, pageNr, perPage);
+        return wrap(new PaginatedResponse<NormalUserDTO>(HttpStatus.OK.value(), displayList, pageNr, perPage));
     }
 }
