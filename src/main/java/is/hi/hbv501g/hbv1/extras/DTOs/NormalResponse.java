@@ -3,6 +3,11 @@ package is.hi.hbv501g.hbv1.extras.DTOs;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * a response DTO used for the body of a response entity
+ *
+ * @param <T> type of objects stored in the data list
+ */
 public class NormalResponse<T> extends BaseResponse<T>{
     public NormalResponse(int status, String message, List<T> data) {
         this.setStatus(status);

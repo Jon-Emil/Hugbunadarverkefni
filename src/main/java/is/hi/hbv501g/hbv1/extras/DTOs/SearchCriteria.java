@@ -6,7 +6,6 @@ import java.util.List;
  * This is a DTO containing all the information that is possible to provide as search parameters for games
  * used when the user wants to find a game by specific parameters
  */
-
 public class SearchCriteria {
     private String title;
     private Float minPrice;

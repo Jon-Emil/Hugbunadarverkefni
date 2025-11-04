@@ -2,6 +2,11 @@ package is.hi.hbv501g.hbv1.extras.DTOs;
 
 import java.util.List;
 
+/**
+ * A super class for our response DTOs containing all things that they have in common
+ *
+ * @param <T> type of the data listed in the data field
+ */
 public abstract class BaseResponse<T> {
     private int status;
     private String message;
