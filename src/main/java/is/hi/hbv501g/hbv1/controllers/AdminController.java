@@ -62,7 +62,7 @@ public class AdminController extends BaseController {
             @RequestPart("coverImage") MultipartFile coverImageFile
             ) {
         try {
-            User admin = extractAdminFromHeader(authHeader, "You must be an admin to add a game");
+            extractAdminFromHeader(authHeader, "You must be an admin to add a game");
         }catch (JwtException e){
             return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }

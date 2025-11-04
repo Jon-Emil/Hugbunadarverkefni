@@ -379,9 +379,12 @@ public class GameController extends BaseController {
     public ResponseEntity<PaginatedResponse<NormalGameDTO>> listGamesByGenreId(
             @PathVariable Long genreId,
             @RequestParam(defaultValue = "1") int pageNr,
-            @RequestParam(defaultValue = "10") int perPage
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "false") Boolean sortReverse
     ) {
         Genre genre = genreService.findById(genreId);
+
         if (genre == null) {
             throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.NOT_FOUND, "Genre not found");
@@ -390,19 +393,10 @@ public class GameController extends BaseController {
         List<Game> allGames = genre.getGames();
         if (allGames == null) allGames = List.of();
 
-        allGames.sort(Comparator.comparing((Game g) -> {
-            String t = g.getTitle();
-            return t == null ? "" : t.toLowerCase();
-        }).thenComparing(g -> g.getTitle() == null ? "" : g.getTitle())
-                .thenComparingLong(Game::getId));
+        allGames = sortHelper.sortGames(allGames, sortBy, sortReverse);
 
-        int page = Math.max(pageNr, 1);
-        int per  = Math.max(perPage, 1);
-        int from = Math.min((page - 1) * per, allGames.size());
-        int to   = Math.min(from + per, allGames.size());
-
-        List<NormalGameDTO> pageDTOs = allGames.subList(from, to).stream().map(NormalGameDTO::new).toList();
-
-        return wrap(new PaginatedResponse<>(200, pageDTOs, page, per));
+        List<NormalGameDTO> allGameDTOs = allGames.stream()
+                .map(NormalGameDTO::new).toList();
+        return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
     }
 }

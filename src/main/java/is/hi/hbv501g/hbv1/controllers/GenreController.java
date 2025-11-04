@@ -52,10 +52,21 @@ public class GenreController extends BaseController {
         return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allGenresDTOs, pageNr, perPage));
     }
 
-    // not finished
+    /**
+     * returns info about a specific genre
+     *
+     * @param genreID id of the genre we want to view
+     *
+     * @return a response entity containing a http code and a message about how the request went
+     */
     @RequestMapping(value = "/genres/{genreID}", method = RequestMethod.GET)
     public ResponseEntity<NormalResponse<NormalGenreDTO>> genreDetails(@PathVariable Long genreID) {
         Genre genre = genreService.findById(genreID);
+
+        if (genre == null) {
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Genre not found"));
+        }
+
         return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Genre found", new NormalGenreDTO(genre)));
     }
 }
