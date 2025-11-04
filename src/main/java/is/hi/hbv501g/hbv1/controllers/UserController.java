@@ -2,21 +2,17 @@ package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
-import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.MyselfUserDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.NormalUserDTO;
-import is.hi.hbv501g.hbv1.extras.entityDTOs.user.ReferencedUserDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.UserToUpdate;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
-import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -73,16 +69,9 @@ public class UserController extends BaseController{
     ) {
         User user;
         try {
-            //Extract current user from Auth token
-            String token = authHeader.replace("Bearer ", "");
-            Long userId = jwtHelper.extractUserId(token);
-            user = userService.findById(userId);
-
-            if (user == null) {
-                return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "You must be logged in to delete your account"));
-            }
+            user = extractUserFromHeader(authHeader, "You must be logged in to delete your account");
         } catch (JwtException e) {
-            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token"));
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
 
         userService.delete(user);
@@ -107,16 +96,9 @@ public class UserController extends BaseController{
     ) {
         User user;
         try {
-            //Extract current user from Auth token
-            String token = authHeader.replace("Bearer ", "");
-            Long userId = jwtHelper.extractUserId(token);
-            user = userService.findById(userId);
-
-            if (user == null) {
-                return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "You must be logged in to change your account"));
-            }
+            user = extractUserFromHeader(authHeader, "You must be logged in to change your account");
         } catch (JwtException e) {
-            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token"));
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
 
         if (res.hasErrors()) {
@@ -150,14 +132,16 @@ public class UserController extends BaseController{
      * @param userId the id of  the user
      * @return response entity with either the users info or an error message
      */
-    @GetMapping("/users/id/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<NormalResponse<NormalUserDTO>> getPublicProfileById(@PathVariable("userId") Long userId) {
-        try {
-            NormalUserDTO user = userService.getPublicProfileById(userId);
-            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Found user", user));
-        } catch (IllegalArgumentException ex) {
+
+        User user = userService.findById(userId);
+
+        if (user == null) {
             return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "No user found with this user id."));
         }
+
+        return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Found user", new NormalUserDTO(user)));
     }
 
     /**
@@ -166,21 +150,18 @@ public class UserController extends BaseController{
      * @param authHeader the header where the session token is stored
      * @return a response entity with the info of the user that is logged in or an error message
      */
-    @GetMapping("/users/me")
+    @GetMapping("/users/profile")
     public ResponseEntity<NormalResponse<MyselfUserDTO>> getOwnProfile(
             @RequestHeader("Authorization") String authHeader
     ) {
+        User user;
         try {
-            String token = authHeader.replace("Bearer ", "");
-            Long userId = jwtHelper.extractUserId(token);
-            User me = userService.findById(userId);
-            if (me == null) {
-                return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid user"));
-            }
-            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Found profile", new MyselfUserDTO(me)));
-        } catch (Exception e) {
-            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), "Invalid or missing token"));
+            user = extractUserFromHeader(authHeader, "You must be logged in to view your profile");
+        } catch (JwtException e) {
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
+
+        return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Found profile", new MyselfUserDTO(user)));
     }
 
     /**

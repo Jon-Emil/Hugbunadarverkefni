@@ -110,13 +110,13 @@ public class HomeController {
                                     "Tags", "[Log In Required], [Requires Valid Request Body]"
                             ),
                             Map.of(
-                                    "path", "/users/id/{userId}",
+                                    "path", "/users/{userId}",
                                     "method", "GET",
                                     "description", "Gets the public profile of a specific user",
                                     "Tags", "[Dynamic]"
                             ),
                             Map.of(
-                                    "path", "/users/me",
+                                    "path", "/users/profile",
                                     "method", "GET",
                                     "description", "Gets the profile of the currently authenticated user",
                                     "Tags", "[Log In Required]"
