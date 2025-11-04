@@ -208,12 +208,6 @@ public class UserServiceImplementation implements UserService {
         gameRepository.save(game);
     }
 
-    @Override @Transactional(readOnly = true)
-    public NormalUserDTO getPublicProfileById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return new NormalUserDTO(user);
-    }
-
     /**
      * makes a user follow the userToFollow
      *

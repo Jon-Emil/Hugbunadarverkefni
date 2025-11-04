@@ -20,7 +20,4 @@ public interface UserService {
     void removeWantToPlay(User user, Game game);
     void addFollow(User user, User userToFollow);
     void removeFollow(User user, User userToUnfollow);
-
-    NormalUserDTO getPublicProfileById(Long userId);
-
 }

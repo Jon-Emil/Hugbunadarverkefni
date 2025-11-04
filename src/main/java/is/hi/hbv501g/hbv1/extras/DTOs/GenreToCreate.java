@@ -3,6 +3,10 @@ package is.hi.hbv501g.hbv1.extras.DTOs;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * A DTO containing all the information needed to create a new genre
+ * used when the user wants to add a genre to our system
+ */
 public class GenreToCreate {
     @NotBlank (message = "Genre must have a title")
     @Size(min = 2, max = 128, message = "Title must be between 2 and 128 characters")

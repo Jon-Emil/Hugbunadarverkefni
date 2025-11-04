@@ -7,7 +7,6 @@ import java.util.List;
  * @param <T> the type of object the data list is supposed to contain
  * used when we want to send paginated lists to the user
  */
-
 public class PaginatedResponse<T> extends BaseResponse<T> {
     private int total;
     private int pageNr;
