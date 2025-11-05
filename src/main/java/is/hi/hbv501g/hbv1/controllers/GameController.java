@@ -12,6 +12,7 @@ import java.util.Comparator;
 
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
+import is.hi.hbv501g.hbv1.services.ReviewService;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +24,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RestController
 public class GameController {
     private final GameService gameService;
     private final UserService userService;
     private final JWTHelper jwtHelper;
+    private final ReviewService reviewService;
 
     @Autowired
     public GameController(
             GameService gameService,
             UserService userService,
-            JWTHelper jwtHelper
+            JWTHelper jwtHelper,
+            ReviewService reviewService
     ) {
         this.gameService = gameService;
         this.userService = userService;
         this.jwtHelper = jwtHelper;
+        this.reviewService = reviewService;
     }
 
     /**
@@ -170,10 +175,74 @@ public class GameController {
         }
 
         try {
-            gameService.postReview(user, game, incomingReview);
+            reviewService.postReview(user, game, incomingReview);
             return ResponseEntity.ok().body("Review successfully added to game with id: " + gameID);
         } catch( IllegalArgumentException error ) {
             return ResponseEntity.badRequest().body(error.getMessage());
+        }
+    }
+    /**
+     * updating existing review for a game.
+     * the user must be authenticated and must be the original author of the review.
+    */
+    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PUT)
+    public ResponseEntity<String> updateReview(
+        @RequestHeader(value = "Authorization") String authHeader,
+        @PathVariable Long gameID,
+        @PathVariable Long reviewID,
+        @Valid @RequestBody Review updateReviewData,
+        BindingResult res
+    ){
+        //check for incoming review data nd show the error if there is
+        if (res.hasErrors()){
+            String errors = res.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
+        }
+        //authenticate the user
+        User user;
+        try{
+            user = extractUserFromHeader(authHeader, "must be logged in to change review");
+        } catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+        //then update the review
+        try {
+            reviewService.updateReview(user, gameID, reviewID, updateReviewData);
+            return ResponseEntity.ok().body("Review " + reviewID + " update successfully");
+            
+        } catch (SecurityException e) { // For "access denied" if user is not the author
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalArgumentException error) { // for data we dont accept
+            return ResponseEntity.badRequest().body(error.getMessage());
+        }
+    }
+
+    /**
+     * DELETE requests for a review.
+     * User must be the author 
+     */
+    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteReview(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable Long gameID,
+            @PathVariable Long reviewID
+    ) {
+        User user;
+        try {
+            user = extractUserFromHeader(authHeader, "You must be logged in to delete a review");
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+
+        try {
+            reviewService.deleteReview(user, gameID, reviewID);
+            
+            return ResponseEntity.ok().body("Review " + reviewID + " deleted successfully");
+
+        } catch (SecurityException e) { //if the user is not the author
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalArgumentException error) { // if the review is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
         }
     }
 

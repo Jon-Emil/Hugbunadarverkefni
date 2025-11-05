@@ -1,67 +1,120 @@
+@baseUrl = http://localhost:8080
+@reviewer_email = reviewer_{{$random.int}}@example.com
+@reviewer_pass = secret123
+@reviewer_username = reviewer_{{$random.int}}
+@game_title = The Legend of Testing - {{$random.uuid}}
+@game_id = 2
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzYwMjAwLCJleHAiOjE3NjIzODE4MDB9.gWWJBriPX5I_B5lCAb1nC-WTl20OINx1K54pdByvmaM
+@review_id = 1
+//////////////////////////////////
+
 ### register
-POST http://localhost:8080/register
+POST {{baseUrl}}/register
 Content-Type: application/json
 
 {
-  "email":    "alice@example.com",
-  "username": "alice",
-  "password": "mypassword"
+  "email": "{{reviewer_email}}",
+  "username": "{{reviewer_username}}",
+  "password": "{{reviewer_pass}}"
 }
 
 ###
-# 2) Log in as Alice (alias = login-alice)
-### login-alice
-POST http://localhost:8080/login
+# 2) Log in 
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "email":    "alice@example.com",
-  "password": "mypassword"
+  "email": "{{reviewer_email}}",
+  "password": "{{reviewer_pass}}"
+}
+
+> {%
+  // Use raw response body because the controller returns the token string directly
+  client.global.set("jwt_token", response.body); 
+%}
+
+###
+# 3) Discover an existing Game ID 
+GET {{baseUrl}}/games
+Authorization: Bearer {{jwt_token}}
+
+> {%
+  // Assuming PaginatedResponse data is under 'data' and the ID is accessible via 'id'
+  if (response.body.data && response.body.data.length > 0) {
+    client.global.set("game_id", response.body.data[0].id);
+    client.log("Discovered Game ID: " + response.body.data[0].id);
+  } else {
+    client.log("CRITICAL: No games found. Review tests will likely fail (404).");
+  }
+%}
+
+###
+# 4) Test Posting a Review (Success)
+POST {{baseUrl}}/games/{{game_id}}/reviews
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "rating": 85,
+  "title": "Amazing Test Game",
+  "text": "This game made me love testing!"
+}
+
+> {%
+  // We assume the first review gets ID 1 if the table is clean, otherwise, adjust logic to get the Review ID dynamically.
+  client.global.set("review_id", 1); 
+%}
+
+###
+# 5) Test Duplicated Review (Failure)
+POST {{baseUrl}}/games/{{game_id}}/reviews
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "rating": 10,
+  "title": "Duplicate Review",
+  "text": "This should fail because I already posted one."
 }
 
 ###
-# 3) Delete Alice’s Account
-### delete-alice
-DELETE http://localhost:8080/auth/delete
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzU5OTE5OTAzLCJleHAiOjE3NTk5NDE1MDN9.f-h45GPKEK8anUbGRh8I11cGYJHYU-gmxCJKAfukmH0
-
-
-//////////////////////////////////////
-
-
-### register-user
-POST http://localhost:8080/register
+# 6) Test Changing Review (Success)
+PUT {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
 Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
 
 {
-  "email":    "reviewer@example.com",
-  "username": "reviewer",
-  "password": "secret123"
+  "rating": 95,
+  "title": "Updated Review Title",
+  "text": "The game got better! New score: 95/100."
 }
 
 ###
-
-### create-game
-POST http://localhost:8080/games
-Content-Type: application/json
-
-{
-  "title": "The Legend of Testing",
-  "genre": "Adventure",
-  "description": "An epic testing journey 2"
-}
+# 7) Delete Review (Success)
+DELETE {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
+Authorization: Bearer {{jwt_token}}
 
 ###
+# 8) Verify Delete (Failure: Not Found)
+DELETE {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
+Authorization: Bearer {{jwt_token}}
 
-### post-review
-POST http://localhost:8080/1/games/1/reviews
+
+### Admin Register for creating games for review tests
+
+
+### Admin Login & Capture Token
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "rating": 5,
-  "title":  "Amazing Test Game",
-  "text":   "This game made me love testing!"
+  "email": "{{admin_email}}",
+  "password": "{{admin_pass}}"
 }
 
+> {%
+  // Capture the admin token as raw text
+  client.global.set("admin_token", response.body);
+%}
 
-//////////////////////
+###
