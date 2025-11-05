@@ -5,7 +5,7 @@
 @game_title = The Legend of Testing - {{$random.uuid}}
 @game_id = 2
 @jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzY4MzE0LCJleHAiOjE3NjIzODk5MTR9.LDJaxkSHhS2b1Bbb0lyt0CoCE7sNl1jc4V7xV3XIQa4
-@review_id = 17
+@review_id = 19
 //////////////////////////////////
 
 

@@ -202,6 +202,50 @@ public class GameController extends BaseController {
         }
     }
 
+
+    /**
+     * 
+     * @param authHeader
+     * @param gameID
+     * @param reviewID
+     * @return
+     */
+
+    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PATCH)
+    public ResponseEntity<String> updateReview(
+        @RequestHeader(value = "Authorization") String authHeader,
+        @PathVariable Long gameID,
+        @PathVariable Long reviewID,
+         @Valid @RequestBody ReviewToUpdate updateReviewData,
+        BindingResult res
+    ){        //check for incoming review data 
+        if (res.hasErrors()){
+            String errors = res.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        //authenticate the user
+        User user;
+        try{
+            user = extractUserFromHeader(authHeader, "must be logged in to change review");
+        } catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+
+        //then update the review
+        try {
+            // changed to now accept ReviewToUpdate DTO
+            reviewService.updateReview(user, gameID, reviewID, updateReviewData);
+            return ResponseEntity.ok().body("Review " + reviewID + " update successfully");
+            } catch (SecurityException e) { 
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            } catch (IllegalArgumentException error) { 
+            return ResponseEntity.badRequest().body(error.getMessage());
+        }
+    }
+
+
+    
     /**
      * DELETE requests for a review.
      * User must be the author 
