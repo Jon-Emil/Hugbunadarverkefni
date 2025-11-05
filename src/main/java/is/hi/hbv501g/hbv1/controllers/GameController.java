@@ -47,7 +47,7 @@ public class GameController extends BaseController {
             GameService gameService,
             UserService userService,
             JWTHelper jwtHelper,
-            ReviewService reviewService
+            ReviewService reviewService,
             SortHelper sortHelper,
             GenreService genreService
     ) {
@@ -67,7 +67,8 @@ public class GameController extends BaseController {
      *
      * @return User object of the userID that is stored in the header
      */
-    private User extractUserFromHeader(String authHeader, String userNotFoundError) {
+    @Override
+    protected User extractUserFromHeader(String authHeader, String userNotFoundError) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new JwtException("Missing or malformed Authorization header");
         }
@@ -77,16 +78,8 @@ public class GameController extends BaseController {
         User user = userService.findById(userId);
         if (user == null) throw new JwtException(userNotFoundError);
         return user;
-            SortHelper sortHelper,
-            GenreService genreService
-    ) {
-        this.gameService = gameService;
-        this.setUserService(userService);
-        this.setJwtHelper(jwtHelper);
-        this.sortHelper = sortHelper;
-        this.genreService = genreService;
     }
-
+    
     /**
      * Handles GET requests on /games
      *
