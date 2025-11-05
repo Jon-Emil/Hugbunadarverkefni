@@ -49,12 +49,11 @@ public class UserServiceImplementation implements UserService {
      * finds a user by their username
      *
      * @param username the username of the user we want to find
-     *
      * @return the first user found
      */
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).getFirst();
+    public List<User> findByUsernameContaining(String username) {
+        return userRepository.findByUsernameContainingIgnoreCase(username);
     }
 
     /**
@@ -209,9 +208,46 @@ public class UserServiceImplementation implements UserService {
         gameRepository.save(game);
     }
 
-    @Override @Transactional(readOnly = true)
-    public NormalUserDTO getPublicProfileById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return new NormalUserDTO(user);
+    /**
+     * makes a user follow the userToFollow
+     *
+     * @param user the user that wants to follow the other user
+     * @param userToFollow the user the main user wants to follow
+     */
+    @Override
+    @Transactional
+    public void addFollow(User user, User userToFollow) {
+        if (user.equals(userToFollow)) {
+            throw new IllegalArgumentException("Users cannot follow themselves");
+        }
+        if (user.getFollows().contains(userToFollow)) {
+            throw new IllegalArgumentException("Connection already exists");
+        }
+
+        user.getFollows().add(userToFollow);
+        userToFollow.getFollowedBy().add(user);
+
+        userRepository.save(user);
+        userRepository.save(userToFollow);
+    }
+
+    /**
+     * makes a user unfollow the userToUnfollow
+     *
+     * @param user the user that wants to unfollow the other user
+     * @param userToUnfollow the user the main user wants to unfollow
+     */
+    @Override
+    @Transactional
+    public void removeFollow(User user, User userToUnfollow) {
+        if (!user.getFollows().contains(userToUnfollow)) {
+            throw new IllegalArgumentException("Connection does not exist");
+        }
+
+        user.getFollows().remove(userToUnfollow);
+        userToUnfollow.getFollowedBy().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(userToUnfollow);
     }
 }

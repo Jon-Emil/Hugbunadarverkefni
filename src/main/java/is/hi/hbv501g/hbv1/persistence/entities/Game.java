@@ -173,4 +173,17 @@ public class Game {
     public void setHavePlayed(List<User> havePlayed) {
         this.havePlayed = havePlayed;
     }
+
+    public Float getAverageRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            return null;
+        }
+
+        float sum = 0;
+        for (Review review : reviews) {
+            sum += review.getRating();
+        }
+
+        return sum / reviews.size();
+    }
 }

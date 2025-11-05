@@ -29,6 +29,7 @@ public class NormalUserDTO {
     private List<ReferencedGameDTO> hasPlayed = new ArrayList<>();
     private List<ReferencedUserDTO> follows = new ArrayList<>();
     private List<ReferencedUserDTO> followedBy = new ArrayList<>();
+    private List<ReferencedReviewDTO> reviews = new ArrayList<>();
 
     public NormalUserDTO(User user) {
         this.id = user.getId();
@@ -42,6 +43,12 @@ public class NormalUserDTO {
                 .map(ReferencedGameDTO::new).toList();
         this.hasPlayed = user.getHasPlayed().stream()
                 .map(ReferencedGameDTO::new).toList();
+        this.follows = user.getFollows().stream()
+                .map(ReferencedUserDTO::new).toList();
+        this.followedBy = user.getFollowedBy().stream()
+                .map(ReferencedUserDTO::new).toList();
+        this.reviews = user.getReviews().stream()
+                .map(ReferencedReviewDTO::new).toList();
     }
 
     public Long getId() {
@@ -75,4 +82,6 @@ public class NormalUserDTO {
     public List<ReferencedUserDTO> getFollows() { return follows; }
 
     public List<ReferencedUserDTO> getFollowedBy() { return followedBy; }
+
+    public List<ReferencedReviewDTO> getReviews() { return reviews; }
 }

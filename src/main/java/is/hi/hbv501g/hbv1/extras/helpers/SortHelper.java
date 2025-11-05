@@ -1,0 +1,294 @@
+package is.hi.hbv501g.hbv1.extras.helpers;
+
+import is.hi.hbv501g.hbv1.persistence.entities.Game;
+import is.hi.hbv501g.hbv1.persistence.entities.Genre;
+import is.hi.hbv501g.hbv1.persistence.entities.Review;
+import is.hi.hbv501g.hbv1.persistence.entities.User;
+import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * Simple class that handles all sorting for our system.
+ *
+ * all methods follow this logic:
+ *
+ * handle nulls
+ * match sortBy and create comparator
+ * reverse comparator if reverse is true
+ * sort and return list
+ */
+
+@Component
+public class SortHelper {
+
+    /**
+     * sorts a list of games
+     * @param games the game list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of games that is sorted and contains the exact same games
+     */
+    public List<Game> sortGames(List<Game> games, String sortBy, Boolean reversed) {
+        if (games == null) {
+            return null;
+        }
+        if (sortBy == null) {
+            sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
+        }
+
+        Comparator<Game> comparator = null;
+
+        switch(sortBy.trim()) {
+            case "title":
+                comparator = Comparator.comparing(
+                        Game::getTitle,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "releaseDate":
+                comparator = Comparator.comparing(
+                        Game::getReleaseDate,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "price":
+                comparator = Comparator.comparingDouble(Game::getPrice);
+                break;
+            case "developer":
+                comparator = Comparator.comparing(
+                        Game::getDeveloper,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "publisher":
+                comparator = Comparator.comparing(
+                        Game::getPublisher,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "reviewAmount":
+                comparator = Comparator.comparingInt(
+                        (Game g) -> g.getReviews() == null ? 0 : g.getReviews().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "favoritesAmount":
+                comparator = Comparator.comparingInt(
+                        (Game g) -> g.getFavoriteOf() == null ? 0 : g.getFavoriteOf().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "wantToPlayAmount":
+                comparator = Comparator.comparingInt(
+                        (Game g) -> g.getWantToPlay() == null ? 0 : g.getWantToPlay().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "havePlayedAmount":
+                comparator = Comparator.comparingInt(
+                        (Game g) -> g.getHavePlayed() == null ? 0 : g.getHavePlayed().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "averageRating":
+                comparator = Comparator.comparing(
+                        Game::getAverageRating,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                );
+                break;
+            default:
+                comparator = Comparator.comparingLong(Game::getId);
+        }
+
+        if (reversed) {
+            comparator = comparator.reversed();
+        }
+
+        games.sort(comparator);
+        return games;
+    }
+
+    /**
+     * sorts a list of genres
+     * @param genres the genre list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of genres that is sorted and contains the exact same genres
+     */
+    public List<Genre> sortGenres(List<Genre> genres, String sortBy, Boolean reversed) {
+        if (genres == null) {
+            return null;
+        }
+        if (sortBy == null) {
+            sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
+        }
+
+        Comparator<Genre> comparator = null;
+
+        switch(sortBy.trim()) {
+            case "title":
+                comparator = Comparator.comparing(
+                        Genre::getTitle,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "gameAmount":
+                comparator = Comparator.comparingInt(
+                        (Genre g) -> g.getGames() == null ? 0 : g.getGames().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            default:
+                comparator = Comparator.comparingLong(Genre::getId);
+        }
+
+        if (reversed) {
+            comparator = comparator.reversed();
+        }
+
+        genres.sort(comparator);
+        return genres;
+    }
+
+    /**
+     * sorts a list of reviews
+     * @param reviews the review list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of reviews that is sorted and contains the exact same reviews
+     */
+    public List<Review> sortReviews(List<Review> reviews, String sortBy, Boolean reversed) {
+        if (reviews == null) {
+            return null;
+        }
+        if (sortBy == null) {
+            sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
+        }
+
+        Comparator<Review> comparator = null;
+
+        switch(sortBy.trim()) {
+            case "title":
+                comparator = Comparator.comparing(
+                        Review::getTitle,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "rating":
+                comparator = Comparator.comparingInt(Review::getRating);
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "username":
+                comparator = Comparator.comparing(
+                        (Review r) -> r.getUser() == null ? null : r.getUser().getUsername(),
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "gameTitle":
+                comparator = Comparator.comparing(
+                        (Review r) -> r.getGame() == null ? null : r.getGame().getTitle(),
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            default:
+                comparator = Comparator.comparingLong(Review::getId);
+        }
+
+        if (reversed) {
+            comparator = comparator.reversed();
+        }
+
+        reviews.sort(comparator);
+        return reviews;
+    }
+
+    /**
+     * sorts a list of users
+     * @param users the user list to sort
+     * @param sortBy what we sort by
+     * @param reversed if the sorting order should be reversed
+     *
+     * @return a new list of users that is sorted and contains the exact same users
+     */
+    public List<User> sortUsers(List<User> users, String sortBy, Boolean reversed) {
+        if (users == null) {
+            return null;
+        }
+        if (sortBy == null) {
+            sortBy = "id";
+        }
+        if (reversed == null) {
+            reversed = false;
+        }
+
+        Comparator<User> comparator = null;
+
+        switch(sortBy.trim()) {
+            case "username":
+                comparator = Comparator.comparing(
+                        User::getUsername,
+                        Comparator.nullsLast(String::compareToIgnoreCase)
+                );
+                break;
+            case "followers":
+                comparator = Comparator.comparingInt(
+                        (User u) -> u.getFollowedBy() == null ? 0 : u.getFollowedBy().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "following":
+                comparator = Comparator.comparingInt(
+                        (User u) -> u.getFollows() == null ? 0 : u.getFollows().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "reviewAmount":
+                comparator = Comparator.comparingInt(
+                        (User u) -> u.getReviews() == null ? 0 : u.getReviews().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "favoriteAmount":
+                comparator = Comparator.comparingInt(
+                        (User u) -> u.getFavorites() == null ? 0 : u.getFavorites().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "wantsToPlayAmount":
+                comparator = Comparator.comparingInt(
+                        (User u) -> u.getWantsToPlay() == null ? 0 : u.getWantsToPlay().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            case "hasPlayedAmount":
+                comparator = Comparator.comparingInt(
+                        (User u) -> u.getHasPlayed() == null ? 0 : u.getHasPlayed().size()
+                );
+                reversed = !reversed; // we want the default to be from highest to lowest so we just flip the reversed value
+                break;
+            default:
+                comparator = Comparator.comparingLong(User::getId);
+        }
+
+        if (reversed) {
+            comparator = comparator.reversed();
+        }
+
+        users.sort(comparator);
+        return users;
+    }
+}

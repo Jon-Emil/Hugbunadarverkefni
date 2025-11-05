@@ -388,23 +388,6 @@ public class GameController {
         }
     }
 
-    /**
-     * View all games in a genre (UC5).
-     *
-     * Retrieves all games for the given {@code genreId}, sorts them by title in
-     * case-insensitive alphabetical order (then by original title and game ID for
-     * stable ordering), paginates the result, and returns a list of DTOs.
-     * If the genre does not exist, a {@link org.springframework.web.server.ResponseStatusException}
-     * with HTTP 404 is thrown.
-     *
-     * @param genreId the genre ID (path variable); if not found, a 404 is thrown
-     * @param pageNr  the page number (1-based; defaults to 1; values < 1 are coerced to 1)
-     * @param perPage the page size (defaults to 10; values < 1 are coerced to 1)
-     *
-     * @return a {@link PaginatedResponse} containing the paginated list of {@link NormalGameDTO}s
-     *
-     * @throws org.springframework.web.server.ResponseStatusException if the genre ID does not exist (HTTP 404)
-     */
     @GetMapping("/games/genre/{genreId}")
     public PaginatedResponse<NormalGameDTO> listGamesByGenreId(
             @PathVariable Long genreId,

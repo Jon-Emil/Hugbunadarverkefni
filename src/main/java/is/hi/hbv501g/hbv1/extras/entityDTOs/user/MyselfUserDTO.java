@@ -1,6 +1,7 @@
 package is.hi.hbv501g.hbv1.extras.entityDTOs.user;
 
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.ReferencedGameDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.review.ReferencedReviewDTO;
 import is.hi.hbv501g.hbv1.persistence.entities.Role;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 
@@ -25,6 +26,7 @@ public class MyselfUserDTO {
     private List<ReferencedGameDTO> favorites =  new ArrayList<>();
     private List<ReferencedGameDTO> wantsToPlay = new ArrayList<>();
     private List<ReferencedGameDTO> hasPlayed = new ArrayList<>();
+    private List<ReferencedReviewDTO> reviews = new ArrayList<>();
 
     public MyselfUserDTO(User user) {
         this.id = user.getId();
@@ -39,6 +41,7 @@ public class MyselfUserDTO {
         this.hasPlayed = user.getHasPlayed().stream().map(ReferencedGameDTO::new).toList();
         this.followedBy = user.getFollowedBy().stream().map(ReferencedUserDTO::new).toList();
         this.follows = user.getFollows().stream().map(ReferencedUserDTO::new).toList();
+        this.reviews = user.getReviews().stream().map(ReferencedReviewDTO::new).toList();
     }
 
     public Long getId() {
@@ -75,4 +78,5 @@ public class MyselfUserDTO {
     public List<ReferencedGameDTO> getHasPlayed() {
         return hasPlayed;
     }
+    public List<ReferencedReviewDTO> getReviews() { return reviews; }
 }
