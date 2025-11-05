@@ -4,12 +4,12 @@
 @reviewer_username = reviewer_{{$random.int}}
 @game_title = The Legend of Testing - {{$random.uuid}}
 @game_id = 2
-@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzY1OTA2LCJleHAiOjE3NjIzODc1MDZ9.vNC1kyav4IMEBbZ1qR27j5VVVKifcdTAHizHTo-07qc
-@review_id = 11
-//////////////////////////////////
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzY4MzE0LCJleHAiOjE3NjIzODk5MTR9.LDJaxkSHhS2b1Bbb0lyt0CoCE7sNl1jc4V7xV3XIQa4
+@review_id = 16
 //////////////////////////////////
 
-### register
+
+### 1) register
 POST {{baseUrl}}/register
 Content-Type: application/json
 
@@ -30,8 +30,9 @@ Content-Type: application/json
 }
 
 > {%
-  // Use raw response body because the controller returns the token string directly
+  // Capture the JWT token for subsequent authenticated requests
   client.global.set("jwt_token", response.body); 
+  client.log("Captured JWT Token.");
 %}
 
 ###
@@ -40,7 +41,7 @@ GET {{baseUrl}}/games
 Authorization: Bearer {{jwt_token}}
 
 > {%
-  // Assuming PaginatedResponse data is under 'data' and the ID is accessible via 'id'
+  // Capture the ID of the first available game
   if (response.body.data && response.body.data.length > 0) {
     client.global.set("game_id", response.body.data[0].id);
     client.log("Discovered Game ID: " + response.body.data[0].id);
@@ -60,6 +61,13 @@ Authorization: Bearer {{jwt_token}}
   "title": "Amazing Test Game",
   "text": "This game made me love testing!"
 }
+
+> {%
+  // **FIX:** Capture the dynamic review ID from the successful 201 response body
+  const newReviewId = response.body.id; 
+  client.global.set("review_id", newReviewId); 
+  client.log("Captured Dynamic Review ID: " + newReviewId);
+%}
 
 ###
 # 5) Test Duplicated Review (Failure)
@@ -94,7 +102,3 @@ Authorization: Bearer {{jwt_token}}
 # 8) Verify Delete (Failure: Not Found)
 DELETE {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
 Authorization: Bearer {{jwt_token}}
-
-
-
-
