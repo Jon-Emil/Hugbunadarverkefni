@@ -15,7 +15,7 @@ public interface ReviewService {
      * @param incomingReview A Review object containing the title, text, and rating.
      * @throws IllegalArgumentException if the user has already reviewed this game.
      */
-    void postReview(User user, Game game, Review incomingReview) throws IllegalArgumentException;
+    Review postReview(User user, Game game, Review incomingReview) throws IllegalArgumentException;
 
     /**
      * change review/update the review

@@ -4,8 +4,9 @@
 @reviewer_username = reviewer_{{$random.int}}
 @game_title = The Legend of Testing - {{$random.uuid}}
 @game_id = 2
-@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzYwMjAwLCJleHAiOjE3NjIzODE4MDB9.gWWJBriPX5I_B5lCAb1nC-WTl20OINx1K54pdByvmaM
-@review_id = 1
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzY1OTA2LCJleHAiOjE3NjIzODc1MDZ9.vNC1kyav4IMEBbZ1qR27j5VVVKifcdTAHizHTo-07qc
+@review_id = 11
+//////////////////////////////////
 //////////////////////////////////
 
 ### register
@@ -60,11 +61,6 @@ Authorization: Bearer {{jwt_token}}
   "text": "This game made me love testing!"
 }
 
-> {%
-  // We assume the first review gets ID 1 if the table is clean, otherwise, adjust logic to get the Review ID dynamically.
-  client.global.set("review_id", 1); 
-%}
-
 ###
 # 5) Test Duplicated Review (Failure)
 POST {{baseUrl}}/games/{{game_id}}/reviews
@@ -100,21 +96,5 @@ DELETE {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
 Authorization: Bearer {{jwt_token}}
 
 
-### Admin Register for creating games for review tests
 
 
-### Admin Login & Capture Token
-POST {{baseUrl}}/login
-Content-Type: application/json
-
-{
-  "email": "{{admin_email}}",
-  "password": "{{admin_pass}}"
-}
-
-> {%
-  // Capture the admin token as raw text
-  client.global.set("admin_token", response.body);
-%}
-
-###

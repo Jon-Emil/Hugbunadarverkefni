@@ -149,7 +149,7 @@ public class GameController {
      * @return A ResponseEntity containing the HTTP code and a body explaining what happened
      */
     @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
-    public ResponseEntity<String> postReview(
+    public ResponseEntity<Review> postReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @Valid @RequestBody Review incomingReview,
@@ -158,28 +158,33 @@ public class GameController {
         if (res.hasErrors()) {
             String errors = res.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(null);
         }
 
         User user;
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to add a review");
         }catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         Game game = gameService.findById(gameID);
 
         if (game == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         try {
-            reviewService.postReview(user, game, incomingReview);
-            return ResponseEntity.ok().body("Review successfully added to game with id: " + gameID);
+            // 2. CHANGE: Modify your reviewService.postReview to return the saved Review object.
+            // You'll need to change the service layer method signature too!
+            Review savedReview = reviewService.postReview(user, game, incomingReview);
+        
+            // 3. CHANGE: Return the Review object with 201 Created status.
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
         } catch( IllegalArgumentException error ) {
-            return ResponseEntity.badRequest().body(error.getMessage());
-        }
+            // Return null body with 400 status.
+            return ResponseEntity.badRequest().body(null); 
+    }
     }
     /**
      * updating existing review for a game.

@@ -20,7 +20,7 @@ public class ReviewServiceImplementation implements ReviewService {
     }
 
     @Override
-    public void postReview(User user, Game game, Review incomingReview) throws IllegalArgumentException {
+    public Review postReview(User user, Game game, Review incomingReview) throws IllegalArgumentException {
         // check if a review exists
         Optional<Review> existing = reviewRepository.findByGameAndUser(game, user);
         
@@ -33,7 +33,9 @@ public class ReviewServiceImplementation implements ReviewService {
         incomingReview.setUser(user);
         incomingReview.setGame(game);
 
-        reviewRepository.save(incomingReview);
+        Review savedReview = reviewRepository.save(incomingReview);
+
+        return savedReview;
     }
     
     @Override
