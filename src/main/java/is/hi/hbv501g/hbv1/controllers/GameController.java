@@ -1,6 +1,8 @@
 package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToCreate;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
@@ -181,6 +183,56 @@ public class GameController {
             return ResponseEntity.ok().body("Review successfully added to game with id: " + gameID);
         } catch( IllegalArgumentException error ) {
             return ResponseEntity.badRequest().body(error.getMessage());
+        }
+    }
+
+    @PatchMapping(value = "/games/{gameID}/reviews/{reviewID}")
+    public ResponseEntity<String> updateReview(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable long gameID,
+            @PathVariable Long reviewID,
+            @Valid @RequestBody ReviewToUpdate reviewToUpdate,
+            BindingResult res
+            ) {
+        User user;
+        try { user = extractUserFromHeader(authHeader, "You must be logged in to update a review"); }
+        catch (JwtException e) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()); }
+
+        if (res.hasErrors()) {
+            String errors = res.getAllErrors().stream()
+                    .map(err -> err.getDefaultMessage()).collect(Collectors.joining(", "));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        Game game = gameService.findById(gameID);
+        if (game == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+
+        try {
+            gameService.updateReview(user, game, reviewID, reviewToUpdate);
+            return ResponseEntity.ok("Review successfully updated");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping(value = "/games/{gameID}/reviews/{reviewID}")
+    public ResponseEntity<String> deleteReview(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable long gameID,
+            @PathVariable Long reviewID
+    ) {
+        User user;
+        try { user = extractUserFromHeader(authHeader, "You must be logged in to delete a review"); }
+        catch (JwtException e) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()); }
+
+        Game game = gameService.findById(gameID);
+        if (game == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found");
+
+        try {
+            gameService.deleteReview(user, game, reviewID);
+            return ResponseEntity.ok("Review successfully deleted");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

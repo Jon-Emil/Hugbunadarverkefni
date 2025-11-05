@@ -6,10 +6,8 @@ import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.NormalGenreDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
-import is.hi.hbv501g.hbv1.persistence.entities.Game;
-import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import is.hi.hbv501g.hbv1.persistence.entities.Role;
-import is.hi.hbv501g.hbv1.persistence.entities.User;
+import is.hi.hbv501g.hbv1.persistence.entities.*;
+import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
 import is.hi.hbv501g.hbv1.services.AuthService;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.GenreService;
@@ -24,24 +22,26 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 public class AdminController extends BaseController {
-
+    private final ReviewRepository reviewRepository;
     private final GameService gameService;
     private final GenreService genreService;
     private final AuthService authService;
     private final CloudinaryService cloudinaryService;
 
     @Autowired
-    public AdminController(GameService gameService, JWTHelper jwtHelper, AuthService authService, CloudinaryService cloudinaryService, GenreService genreService, UserService userService) {
+    public AdminController(GameService gameService, JWTHelper jwtHelper, AuthService authService, CloudinaryService cloudinaryService, GenreService genreService, UserService userService,  ReviewRepository reviewRepository) {
         this.gameService = gameService;
         this.authService = authService;
         this.cloudinaryService = cloudinaryService;
         this.genreService = genreService;
         this.setUserService(userService);
         this.setJwtHelper(jwtHelper);
+        this.reviewRepository = reviewRepository;
     }
 
     /**
@@ -331,5 +331,32 @@ public class AdminController extends BaseController {
 
         genreService.delete(genre);
         return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Successfully deleted genre with id: " + genreID));
+    }
+
+    @RequestMapping(value = "/reviews/{reviewID}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteReview(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long reviewID) {
+
+        User admin;
+        try {
+            admin = extractUserFromHeader(authHeader, "You must be logged in as admin to delete reviews");
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+
+        if (admin.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Admin role required");
+        }
+
+        Optional<Review> opt = reviewRepository.findById(reviewID);
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review not found");
+        }
+        Review review = opt.get();
+
+        gameService.deleteReview(admin, review.getGame(), review.getId());
+
+        return ResponseEntity.ok("Review successfully deleted by admin");
     }
 }

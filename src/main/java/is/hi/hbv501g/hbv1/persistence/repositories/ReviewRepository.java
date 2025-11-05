@@ -10,8 +10,7 @@ import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 
 @Repository
-public interface ReviewRepository 
-    extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findByGameAndUser(Game game, User user);
     List<Review> findAll();
     Review save(Review review);

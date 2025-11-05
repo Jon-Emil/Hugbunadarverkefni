@@ -1,5 +1,6 @@
 package is.hi.hbv501g.hbv1.services;
 
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
@@ -18,4 +19,6 @@ public interface GameService {
     Game add(Game game, List<Long> genreIds);
 
     Review postReview(User user, Game game, Review incomingReview);
+    Review updateReview(User user, Game game, Long reviewId, ReviewToUpdate reviewToUpdate);
+    void deleteReview(User user, Game game, Long reviewId);
 }

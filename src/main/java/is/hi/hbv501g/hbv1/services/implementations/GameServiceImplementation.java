@@ -1,10 +1,9 @@
 package is.hi.hbv501g.hbv1.services.implementations;
 
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToCreate;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
-import is.hi.hbv501g.hbv1.persistence.entities.Game;
-import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import is.hi.hbv501g.hbv1.persistence.entities.Review;
-import is.hi.hbv501g.hbv1.persistence.entities.User;
+import is.hi.hbv501g.hbv1.persistence.entities.*;
 import is.hi.hbv501g.hbv1.persistence.repositories.GameRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.GenreRepository;
 import is.hi.hbv501g.hbv1.persistence.repositories.ReviewRepository;
@@ -199,5 +198,46 @@ public class GameServiceImplementation implements GameService {
         review.setGame(game);
 
         return reviewRepository.save(review);
+    }
+
+    @Override
+    @Transactional
+    public Review updateReview(User user, Game game, Long reviewId, ReviewToUpdate reviewToUpdate) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("Review not found"));
+
+        if (review.getGame().getId() != game.getId()) {
+            throw new IllegalArgumentException("Review does not belong to this game");
+        }
+
+        boolean isOwner = review.getUser() != null && review.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+        if (!isOwner && !isAdmin) {
+            throw new IllegalArgumentException("You are not allowed to update this review.");
+        }
+
+        if (reviewToUpdate.getTitle() != null) review.setTitle(reviewToUpdate.getTitle().trim());
+        if (reviewToUpdate.getText() != null) review.setText(reviewToUpdate.getText());
+        if (reviewToUpdate.getRating() != null) review.setRating(reviewToUpdate.getRating());
+
+        return  reviewRepository.save(review);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(User actor, Game game, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found"));
+
+        if (review.getGame().getId() != game.getId()) {
+            throw new IllegalArgumentException("Review does not belong to this game");
+        }
+
+        boolean isOwner = review.getUser() != null && review.getUser().getId().equals(actor.getId());
+        boolean isAdmin = actor.getRole() == Role.ADMIN;
+        if (!isOwner && !isAdmin) {
+            throw new IllegalArgumentException("You are not allowed to delete this review");
+        }
+
+        reviewRepository.delete(review);
     }
 }
