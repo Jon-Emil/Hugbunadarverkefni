@@ -190,7 +190,7 @@ public class GameController {
      * updating existing review for a game.
      * the user must be authenticated and must be the original author of the review.
     */
-    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PUT)
+    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PATCH)
     public ResponseEntity<String> updateReview(
         @RequestHeader(value = "Authorization") String authHeader,
         @PathVariable Long gameID,
