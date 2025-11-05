@@ -88,18 +88,22 @@ public class Review {
         this.text = text;
     }
 
+    // get user
     public User getUser() {
         return user;
     }
 
+    // set user
     public void setUser(User user) {
         this.user = user;
     }
 
+    // get game
     public Game getGame() {
         return game;
     }
 
+    // set game
     public void setGame(Game game) {
         this.game = game;
     }

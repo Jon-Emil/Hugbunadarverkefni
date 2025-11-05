@@ -2,8 +2,11 @@ package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToCreate;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
@@ -143,21 +146,20 @@ public class GameController {
      *
      * @param authHeader Token used for authenticating users
      * @param gameID ID of the game we want to post a review to
-     * @param incomingReview The contents of the review
-     * @param res The validation results of the incomingReview param
+     * @param incomingReview The contents of the review using ReviewToCreate DTO
+     * @param res The validation results of the incomingReview parameters
      *
-     * @return A ResponseEntity containing the HTTP code and a body explaining what happened
+     * @return A ResponseEntity containing the code and the created NormalReviewDTO
      */
     @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
-    public ResponseEntity<Review> postReview(
+    // used NormalReviewDTO instead of Review object
+    public ResponseEntity<NormalReviewDTO> postReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
-            @Valid @RequestBody Review incomingReview,
+            @Valid @RequestBody ReviewToCreate incomingReview,
             BindingResult res
     ) {
         if (res.hasErrors()) {
-            String errors = res.getAllErrors().stream()
-                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
             return ResponseEntity.badRequest().body(null);
         }
 
@@ -175,34 +177,37 @@ public class GameController {
         }
 
         try {
-            // 2. CHANGE: Modify your reviewService.postReview to return the saved Review object.
-            // You'll need to change the service layer method signature too!
+            //uilized the ReviewToCreate DTO
             Review savedReview = reviewService.postReview(user, game, incomingReview);
-        
-            // 3. CHANGE: Return the Review object with 201 Created status.
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
+            
+            // canged saved Review entity to NormalReviewDTO for the response
+            NormalReviewDTO reviewDTO = new NormalReviewDTO(savedReview);
+            return ResponseEntity.status(HttpStatus.CREATED).body(reviewDTO);
         } catch( IllegalArgumentException error ) {
-            // Return null body with 400 status.
             return ResponseEntity.badRequest().body(null); 
+        }
     }
-    }
+
+    
     /**
-     * updating existing review for a game.
-     * the user must be authenticated and must be the original author of the review.
-    */
+     * Updating existing review for a game.
+     * user must be logged in and be the author of the review
+     * * Using PATCH now instead fo put like before 
+     */
     @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PATCH)
     public ResponseEntity<String> updateReview(
         @RequestHeader(value = "Authorization") String authHeader,
         @PathVariable Long gameID,
         @PathVariable Long reviewID,
-        @Valid @RequestBody Review updateReviewData,
+        @Valid @RequestBody ReviewToUpdate updateReviewData,
         BindingResult res
     ){
-        //check for incoming review data nd show the error if there is
+        //check for incoming review data 
         if (res.hasErrors()){
             String errors = res.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
             return ResponseEntity.badRequest().body(errors);
         }
+        
         //authenticate the user
         User user;
         try{
@@ -210,14 +215,16 @@ public class GameController {
         } catch (JwtException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
+        
         //then update the review
         try {
+            // changed to now accept ReviewToUpdate DTO
             reviewService.updateReview(user, gameID, reviewID, updateReviewData);
             return ResponseEntity.ok().body("Review " + reviewID + " update successfully");
             
-        } catch (SecurityException e) { // For "access denied" if user is not the author
+        } catch (SecurityException e) { 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (IllegalArgumentException error) { // for data we dont accept
+        } catch (IllegalArgumentException error) { 
             return ResponseEntity.badRequest().body(error.getMessage());
         }
     }

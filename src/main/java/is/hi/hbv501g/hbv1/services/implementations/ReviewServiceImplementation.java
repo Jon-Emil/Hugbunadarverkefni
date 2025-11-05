@@ -1,5 +1,7 @@
 package is.hi.hbv501g.hbv1.services.implementations;
 
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToCreate; 
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate; 
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
@@ -20,45 +22,59 @@ public class ReviewServiceImplementation implements ReviewService {
     }
 
     @Override
-    public Review postReview(User user, Game game, Review incomingReview) throws IllegalArgumentException {
-        // check if a review exists
+    // changed to allow ReviewToCreate DTO
+    public Review postReview(User user, Game game, ReviewToCreate incomingReviewDTO) throws IllegalArgumentException {
         Optional<Review> existing = reviewRepository.findByGameAndUser(game, user);
         
         if (existing.isPresent()) {
             throw new IllegalArgumentException("You have already submitted a review for this game");
         }
 
-        // ncomingReview only has text, title, rating.
-        // and set the user and game relationships.
-        incomingReview.setUser(user);
-        incomingReview.setGame(game);
+        // now creating the Review entity from the DTO data
+        Review newReview = new Review(); 
+        newReview.setTitle(incomingReviewDTO.getTitle());
+        newReview.setText(incomingReviewDTO.getText());
+        newReview.setRating(incomingReviewDTO.getRating());
 
-        Review savedReview = reviewRepository.save(incomingReview);
+        //the relationships
+        newReview.setUser(user);
+        newReview.setGame(game);
+
+        Review savedReview = reviewRepository.save(newReview);
 
         return savedReview;
     }
     
     @Override
-    public void updateReview(User user, Long gameID, Long reviewID, Review updateReviewData)
+    //changed to accept ReviewToUpdate DTO
+    public void updateReview(User user, Long gameID, Long reviewID, ReviewToUpdate updateReviewDTO)
             throws SecurityException, IllegalArgumentException {
         
-        //find the review in the database
+        //find the review 
         Review existingReview = reviewRepository.findById(reviewID)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewID));
 
         // check if the review belongs to the game
-        if (existingReview.getGame().getId() != gameID) {
+        if (!Long.valueOf(existingReview.getGame().getId()).equals(gameID)) { 
             throw new IllegalArgumentException("This review does not belong to the specified game");
         }
 
-        //check perm
-        if (existingReview.getUser().getId() != user.getId()) { 
+        //check permission
+        if (!existingReview.getUser().getId().equals(user.getId())) { 
             throw new SecurityException("Access Denied: You are not the author of this review");
         }
 
-        existingReview.setTitle(updateReviewData.getTitle());
-        existingReview.setText(updateReviewData.getText());
-        existingReview.setRating(updateReviewData.getRating());
+        //updates fields that are provided or those that are not null
+        if (updateReviewDTO.getTitle() != null) {
+            existingReview.setTitle(updateReviewDTO.getTitle());
+        }
+        if (updateReviewDTO.getText() != null) {
+            existingReview.setText(updateReviewDTO.getText());
+        }
+        // Rating is an Int in the DTO, so we check for null
+        if (updateReviewDTO.getRating() != null) {
+            existingReview.setRating(updateReviewDTO.getRating());
+        }
 
         reviewRepository.save(existingReview);
     }
@@ -70,12 +86,13 @@ public class ReviewServiceImplementation implements ReviewService {
         Review reviewToDelete = reviewRepository.findById(reviewID)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewID));
 
-        
-        if (reviewToDelete.getGame().getId() != gameID) { // Using !=
+
+        if (!Long.valueOf(reviewToDelete.getGame().getId()).equals(gameID)) { 
             throw new IllegalArgumentException("This review does not belong to the specified game");
         }
 
-        if (reviewToDelete.getUser().getId() != user.getId()) { // Using !=
+
+        if (!reviewToDelete.getUser().getId().equals(user.getId())) { 
             throw new SecurityException("Access Denied: You are not the author of this review");
         }
         reviewRepository.delete(reviewToDelete);
