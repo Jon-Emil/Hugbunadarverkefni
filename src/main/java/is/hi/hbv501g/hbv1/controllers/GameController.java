@@ -7,6 +7,8 @@ import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToCreate;
+import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
@@ -17,6 +19,7 @@ import java.util.Comparator;
 
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
+import is.hi.hbv501g.hbv1.services.ReviewService;
 import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
@@ -29,9 +32,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RestController
 public class GameController extends BaseController {
     private final GameService gameService;
+    private final UserService userService;
+    private final JWTHelper jwtHelper;
+    private final ReviewService reviewService;
     private final SortHelper sortHelper;
     private final GenreService genreService;
 
@@ -40,6 +47,36 @@ public class GameController extends BaseController {
             GameService gameService,
             UserService userService,
             JWTHelper jwtHelper,
+            ReviewService reviewService
+            SortHelper sortHelper,
+            GenreService genreService
+    ) {
+        this.gameService = gameService;
+        this.userService = userService;
+        this.jwtHelper = jwtHelper;
+        this.reviewService = reviewService;
+        this.sortHelper = sortHelper;
+        this.genreService = genreService;
+    }
+
+    /**
+     * Helper function used to easily get the User from the userID stored in the Auth header
+     *
+     * @param authHeader Where the token is stored
+     * @param userNotFoundError What we want the error message to be if we don't find a user matching the userID
+     *
+     * @return User object of the userID that is stored in the header
+     */
+    private User extractUserFromHeader(String authHeader, String userNotFoundError) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new JwtException("Missing or malformed Authorization header");
+        }
+
+        String token = authHeader.substring(7); // safer than replace()
+        Long userId = jwtHelper.extractUserId(token);
+        User user = userService.findById(userId);
+        if (user == null) throw new JwtException(userNotFoundError);
+        return user;
             SortHelper sortHelper,
             GenreService genreService
     ) {
@@ -133,16 +170,16 @@ public class GameController extends BaseController {
      *
      * @param authHeader Token used for authenticating users
      * @param gameID ID of the game we want to post a review to
-     * @param incomingReview The contents of the review
-     * @param res The validation results of the incomingReview param
+     * @param incomingReview The contents of the review using ReviewToCreate DTO
+     * @param res The validation results of the incomingReview parameters
      *
-     * @return A ResponseEntity containing the HTTP code and a body explaining what happened
+     * @return A ResponseEntity containing the code and the created NormalReviewDTO
      */
     @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
     public ResponseEntity<BaseResponse<NormalReviewDTO>> postReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
-            @Valid @RequestBody Review incomingReview,
+            @Valid @RequestBody ReviewToCreate incomingReview,
             BindingResult res
     ) {
         if (res.hasErrors()) {
@@ -165,10 +202,39 @@ public class GameController extends BaseController {
         }
 
         try {
-            Review newReview = gameService.postReview(user, game, incomingReview);
+            Review newReview = reviewService.postReview(user, game, incomingReview);
             return wrap(new NormalResponse<NormalReviewDTO>(HttpStatus.CREATED.value(), "Review successfully added to game with id: " + gameID, new NormalReviewDTO(newReview)));
         } catch( IllegalArgumentException error ) {
             return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage()));
+        }
+    }
+
+    /**
+     * DELETE requests for a review.
+     * User must be the author 
+     */
+    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteReview(
+            @RequestHeader(value = "Authorization") String authHeader,
+            @PathVariable Long gameID,
+            @PathVariable Long reviewID
+    ) {
+        User user;
+        try {
+            user = extractUserFromHeader(authHeader, "You must be logged in to delete a review");
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+
+        try {
+            reviewService.deleteReview(user, gameID, reviewID);
+            
+            return ResponseEntity.ok().body("Review " + reviewID + " deleted successfully");
+
+        } catch (SecurityException e) { //if the user is not the author
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalArgumentException error) { // if the review is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
         }
     }
 

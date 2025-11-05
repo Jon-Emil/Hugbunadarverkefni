@@ -1,67 +1,104 @@
-### register
-POST http://localhost:8080/register
+@baseUrl = http://localhost:8080
+@reviewer_email = reviewer_{{$random.int}}@example.com
+@reviewer_pass = secret123
+@reviewer_username = reviewer_{{$random.int}}
+@game_title = The Legend of Testing - {{$random.uuid}}
+@game_id = 2
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYyMzY4MzE0LCJleHAiOjE3NjIzODk5MTR9.LDJaxkSHhS2b1Bbb0lyt0CoCE7sNl1jc4V7xV3XIQa4
+@review_id = 17
+//////////////////////////////////
+
+
+### 1) register
+POST {{baseUrl}}/register
 Content-Type: application/json
 
 {
-  "email":    "alice@example.com",
-  "username": "alice",
-  "password": "mypassword"
+  "email": "{{reviewer_email}}",
+  "username": "{{reviewer_username}}",
+  "password": "{{reviewer_pass}}"
 }
 
 ###
-# 2) Log in as Alice (alias = login-alice)
-### login-alice
-POST http://localhost:8080/login
+# 2) Log in 
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "email":    "alice@example.com",
-  "password": "mypassword"
+  "email": "{{reviewer_email}}",
+  "password": "{{reviewer_pass}}"
+}
+
+> {%
+  // Capture the JWT token for subsequent authenticated requests
+  client.global.set("jwt_token", response.body); 
+  client.log("Captured JWT Token.");
+%}
+
+###
+# 3) Discover an existing Game ID 
+GET {{baseUrl}}/games
+Authorization: Bearer {{jwt_token}}
+
+> {%
+  // Capture the ID of the first available game
+  if (response.body.data && response.body.data.length > 0) {
+    client.global.set("game_id", response.body.data[0].id);
+    client.log("Discovered Game ID: " + response.body.data[0].id);
+  } else {
+    client.log("CRITICAL: No games found. Review tests will likely fail (404).");
+  }
+%}
+
+###
+# 4) Test Posting a Review (Success)
+POST {{baseUrl}}/games/{{game_id}}/reviews
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "rating": 85,
+  "title": "Amazing Test Game",
+  "text": "This game made me love testing!"
+}
+
+> {%
+  //doesnt work
+  const newReviewId = response.body.id; 
+  client.global.set("review_id", newReviewId); 
+  client.log("Captured Dynamic Review ID: " + newReviewId);
+%}
+
+###
+# 5) Test Duplicated Review should fail
+POST {{baseUrl}}/games/{{game_id}}/reviews
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "rating": 10,
+  "title": "Duplicate Review",
+  "text": "This should fail because I already posted one."
 }
 
 ###
-# 3) Delete Alice’s Account
-### delete-alice
-DELETE http://localhost:8080/auth/delete
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzU5OTE5OTAzLCJleHAiOjE3NTk5NDE1MDN9.f-h45GPKEK8anUbGRh8I11cGYJHYU-gmxCJKAfukmH0
-
-
-//////////////////////////////////////
-
-
-### register-user
-POST http://localhost:8080/register
+# 6) Test Changing Review (Success)
+PATCH  {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
 Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
 
 {
-  "email":    "reviewer@example.com",
-  "username": "reviewer",
-  "password": "secret123"
+  "rating": 95,
+  "title": "Updated Review Title",
+  "text": "The game got better! New score: 95/100."
 }
 
 ###
-
-### create-game
-POST http://localhost:8080/games
-Content-Type: application/json
-
-{
-  "title": "The Legend of Testing",
-  "genre": "Adventure",
-  "description": "An epic testing journey 2"
-}
+# 7) Delete Review (Success)
+DELETE {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
+Authorization: Bearer {{jwt_token}}
 
 ###
-
-### post-review
-POST http://localhost:8080/1/games/1/reviews
-Content-Type: application/json
-
-{
-  "rating": 5,
-  "title":  "Amazing Test Game",
-  "text":   "This game made me love testing!"
-}
-
-
-//////////////////////
+# 8) Verify Delete (Failure: Not Found)
+DELETE {{baseUrl}}/games/{{game_id}}/reviews/{{review_id}}
+Authorization: Bearer {{jwt_token}}

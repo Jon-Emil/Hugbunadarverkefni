@@ -19,6 +19,7 @@ public class Genre {
     private String description;
 
     @ManyToMany(mappedBy = "genres")
+    @JsonIgnore
     private List<Game> games  = new ArrayList<>();
 
     public Genre() {
