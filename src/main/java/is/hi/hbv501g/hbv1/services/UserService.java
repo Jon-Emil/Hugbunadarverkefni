@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserService {
     User findById(Long id);
     List<User> findAll();
-    User findByUsername(String username);
+    List<User> findByUsernameContaining(String username);
     User save(User user);
     void delete(User user);
     void addFavorite(User user, Game game);
@@ -18,7 +18,6 @@ public interface UserService {
     void removeFavorite(User user, Game game);
     void removeHasPlayed(User user, Game game);
     void removeWantToPlay(User user, Game game);
-
-    NormalUserDTO getPublicProfileById(Long userId);
-
+    void addFollow(User user, User userToFollow);
+    void removeFollow(User user, User userToUnfollow);
 }

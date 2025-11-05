@@ -7,39 +7,35 @@ import java.util.List;
  * @param <T> the type of object the data list is supposed to contain
  * used when we want to send paginated lists to the user
  */
-
-public class PaginatedResponse<T> {
-    private int status;
-    private List<T> data;
+public class PaginatedResponse<T> extends BaseResponse<T> {
     private int total;
     private int pageNr;
     private int perPage;
 
     public PaginatedResponse(int status, List<T> data, int pageNr, int perPage) {
-        this.status = status;
+        this.setStatus(status);
+        this.setMessage("");
         this.total = data.size();
         this.pageNr = pageNr;
         this.perPage = perPage;
 
+        this.setData(paginate(data, pageNr, perPage));
+    }
+
+    public PaginatedResponse(int status, List<T> data, int pageNr, int perPage, String message) {
+        this.setStatus(status);
+        this.setMessage(message);
+        this.total = data.size();
+        this.pageNr = pageNr;
+        this.perPage = perPage;
+
+        this.setData(paginate(data, pageNr, perPage));
+    }
+
+    private List<T> paginate(List<T> data, int pageNr, int perPage) {
         int startIndex = Math.min((pageNr - 1) * perPage, data.size());
         int endIndex = Math.min(startIndex + perPage, data.size());
-        this.data = data.subList(startIndex, endIndex);
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public List<T> getData() {
-        return data;
-    }
-
-    public void setData(List<T> data) {
-        this.data = data;
+        return List.copyOf(data.subList(startIndex, endIndex));
     }
 
     public int getTotal() {
