@@ -38,7 +38,6 @@ public class GameController extends BaseController {
     private final GameService gameService;
     private final UserService userService;
     private final JWTHelper jwtHelper;
-    private final ReviewService reviewService;
     private final SortHelper sortHelper;
     private final GenreService genreService;
 
@@ -47,14 +46,12 @@ public class GameController extends BaseController {
             GameService gameService,
             UserService userService,
             JWTHelper jwtHelper,
-            ReviewService reviewService,
             SortHelper sortHelper,
             GenreService genreService
     ) {
         this.gameService = gameService;
         this.userService = userService;
         this.jwtHelper = jwtHelper;
-        this.reviewService = reviewService;
         this.sortHelper = sortHelper;
         this.genreService = genreService;
     }
@@ -156,123 +153,6 @@ public class GameController extends BaseController {
         List<NormalGameDTO> allGameDTOs = foundGames.stream()
                 .map(NormalGameDTO::new).toList();
         return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
-    }
-
-    /**
-     * Handles POST requests on the /games/{gameID}/reviews
-     *
-     * @param authHeader Token used for authenticating users
-     * @param gameID ID of the game we want to post a review to
-     * @param incomingReview The contents of the review using ReviewToCreate DTO
-     * @param res The validation results of the incomingReview parameters
-     *
-     * @return A ResponseEntity containing the code and the created NormalReviewDTO
-     */
-    @RequestMapping(value = "/games/{gameID}/reviews", method = RequestMethod.POST)
-    public ResponseEntity<BaseResponse<NormalReviewDTO>> postReview(
-            @RequestHeader(value = "Authorization") String authHeader,
-            @PathVariable Long gameID,
-            @Valid @RequestBody ReviewToCreate incomingReview,
-            BindingResult res
-    ) {
-        if (res.hasErrors()) {
-            String errors = res.getAllErrors().stream()
-                    .map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors));
-        }
-
-        User user;
-        try {
-            user = extractUserFromHeader(authHeader, "You must be logged in to add a review");
-        }catch (JwtException e){
-            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
-        }
-
-        Game game = gameService.findById(gameID);
-
-        if (game == null) {
-            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found"));
-        }
-
-        try {
-            Review newReview = reviewService.postReview(user, game, incomingReview);
-            return wrap(new NormalResponse<NormalReviewDTO>(HttpStatus.CREATED.value(), "Review successfully added to game with id: " + gameID, new NormalReviewDTO(newReview)));
-        } catch( IllegalArgumentException error ) {
-            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage()));
-        }
-    }
-
-
-    /**
-     * 
-     * @param authHeader
-     * @param gameID
-     * @param reviewID
-     * @return
-     */
-
-    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PATCH)
-    public ResponseEntity<String> updateReview(
-        @RequestHeader(value = "Authorization") String authHeader,
-        @PathVariable Long gameID,
-        @PathVariable Long reviewID,
-         @Valid @RequestBody ReviewToUpdate updateReviewData,
-        BindingResult res
-    ){        //check for incoming review data 
-        if (res.hasErrors()){
-            String errors = res.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
-        }
-
-        //authenticate the user
-        User user;
-        try{
-            user = extractUserFromHeader(authHeader, "must be logged in to change review");
-        } catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-
-        //then update the review
-        try {
-            // changed to now accept ReviewToUpdate DTO
-            reviewService.updateReview(user, gameID, reviewID, updateReviewData);
-            return ResponseEntity.ok().body("Review " + reviewID + " update successfully");
-            } catch (SecurityException e) { 
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-            } catch (IllegalArgumentException error) { 
-            return ResponseEntity.badRequest().body(error.getMessage());
-        }
-    }
-
-
-    
-    /**
-     * DELETE requests for a review.
-     * User must be the author 
-     */
-    @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteReview(
-            @RequestHeader(value = "Authorization") String authHeader,
-            @PathVariable Long gameID,
-            @PathVariable Long reviewID
-    ) {
-        User user;
-        try {
-            user = extractUserFromHeader(authHeader, "You must be logged in to delete a review");
-        } catch (JwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-
-        try {
-            reviewService.deleteReview(user, gameID, reviewID);
-            
-            return ResponseEntity.ok().body("Review " + reviewID + " deleted successfully");
-
-        } catch (SecurityException e) { //if the user is not the author
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (IllegalArgumentException error) { // if the review is not found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
-        }
     }
 
     /**
@@ -502,27 +382,5 @@ public class GameController extends BaseController {
         List<NormalGameDTO> allGameDTOs = allGames.stream()
                 .map(NormalGameDTO::new).toList();
         return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
-    }
-
-    @RequestMapping(value = "/games/{gameID}/reviews")
-    public ResponseEntity<BaseResponse<NormalReviewDTO>> seeGamesReviews(
-            @PathVariable("gameID") Long gameID,
-            @RequestParam(defaultValue = "1") int pageNr,
-            @RequestParam(defaultValue = "10") int perPage,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "false") Boolean sortReverse
-    ) {
-        Game game = gameService.findById(gameID);
-
-        if (game == null) {
-            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found"));
-        }
-
-        List<Review> allReviews = game.getReviews();
-        allReviews = sortHelper.sortReviews(allReviews, sortBy, sortReverse);
-
-        List<NormalReviewDTO> allGameDTOs = allReviews.stream()
-                .map(NormalReviewDTO::new).toList();
-        return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allGameDTOs, pageNr,perPage));
     }
 }
