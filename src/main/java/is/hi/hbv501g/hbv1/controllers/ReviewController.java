@@ -3,12 +3,15 @@ package is.hi.hbv501g.hbv1.controllers;
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.DTOs.*;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
+import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
+import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.ReviewService;
+import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,20 +22,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RestController
 public class ReviewController extends BaseController {
     private final GameService gameService;
-    private final ReviewService reviewService;
     private final SortHelper sortHelper;
+    private final ReviewService reviewService;
 
     @Autowired
     public ReviewController(
             GameService gameService,
-            ReviewService reviewService,
-            SortHelper sortHelper
+            UserService userService,
+            JWTHelper jwtHelper,
+            SortHelper sortHelper,
+            ReviewService reviewService
     ) {
         this.gameService = gameService;
-        this.reviewService = reviewService;
+        this.userService = userService;
+        this.jwtHelper = jwtHelper;
         this.sortHelper = sortHelper;
+        this.reviewService = reviewService;
     }
 
 
@@ -53,9 +61,9 @@ public class ReviewController extends BaseController {
         List<Review> allReviews = game.getReviews();
         allReviews = sortHelper.sortReviews(allReviews, sortBy, sortReverse);
 
-        List<NormalReviewDTO> allGameDTOs = allReviews.stream()
+        List<NormalReviewDTO> allReviewDTOs = allReviews.stream()
                 .map(NormalReviewDTO::new).toList();
-        return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allGameDTOs, pageNr,perPage));
+        return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allReviewDTOs, pageNr,perPage));
     }
 
     /**
