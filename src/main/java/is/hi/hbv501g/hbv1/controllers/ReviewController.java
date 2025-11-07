@@ -9,7 +9,6 @@ import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Review;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
-import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.ReviewService;
 import is.hi.hbv501g.hbv1.services.UserService;
 import jakarta.validation.Valid;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,13 +110,14 @@ public class ReviewController extends BaseController {
 
 
     /**
+     * Handles PATCH requests on the /games/{gameID}/reviews/{reviewID}
      *
-     * @param authHeader
-     * @param gameID
-     * @param reviewID
-     * @return
+     * @param authHeader The header containing the session token
+     * @param gameID the id of the game that the review is for
+     * @param reviewID the id of the review we want to edit
+     *
+     * @return a response entity containing information on how the request went
      */
-
     @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PATCH)
     public ResponseEntity<String> updateReview(
             @RequestHeader(value = "Authorization") String authHeader,
@@ -154,8 +153,13 @@ public class ReviewController extends BaseController {
 
 
     /**
-     * DELETE requests for a review.
-     * User must be the author
+     * Handles DELETE requests on the /games/{gameID}/reviews/{reviewID}
+     *
+     * @param authHeader The header containing the session token
+     * @param gameID the id of the game that the review is for
+     * @param reviewID the id of the review we want to delete
+     *
+     * @return a response entity containing information on how the request went
      */
     @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteReview(

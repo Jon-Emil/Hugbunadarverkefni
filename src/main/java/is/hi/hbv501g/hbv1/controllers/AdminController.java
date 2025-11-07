@@ -8,9 +8,7 @@ import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import is.hi.hbv501g.hbv1.persistence.entities.Role;
 import is.hi.hbv501g.hbv1.persistence.entities.User;
-import is.hi.hbv501g.hbv1.services.AuthService;
 import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.UserService;
@@ -28,16 +26,13 @@ import java.util.stream.Collectors;
 
 @RestController
 public class AdminController extends BaseController {
-
     private final GameService gameService;
     private final GenreService genreService;
-    private final AuthService authService;
     private final CloudinaryService cloudinaryService;
 
     @Autowired
-    public AdminController(GameService gameService, JWTHelper jwtHelper, AuthService authService, CloudinaryService cloudinaryService, GenreService genreService, UserService userService) {
+    public AdminController(GameService gameService, JWTHelper jwtHelper, CloudinaryService cloudinaryService, GenreService genreService, UserService userService) {
         this.gameService = gameService;
-        this.authService = authService;
         this.cloudinaryService = cloudinaryService;
         this.genreService = genreService;
         this.setUserService(userService);

@@ -4,33 +4,21 @@ import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
-import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
-import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToCreate;
-import is.hi.hbv501g.hbv1.extras.DTOs.ReviewToUpdate;
 import is.hi.hbv501g.hbv1.extras.DTOs.SearchCriteria;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import is.hi.hbv501g.hbv1.persistence.entities.Review;
-
-import java.util.Comparator;
-
 import is.hi.hbv501g.hbv1.persistence.entities.User;
 import is.hi.hbv501g.hbv1.services.GameService;
-import is.hi.hbv501g.hbv1.services.ReviewService;
 import is.hi.hbv501g.hbv1.services.GenreService;
 import is.hi.hbv501g.hbv1.services.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
