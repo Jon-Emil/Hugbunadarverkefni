@@ -6,14 +6,11 @@ import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.NormalGenreDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import is.hi.hbv501g.hbv1.services.GameService;
 import is.hi.hbv501g.hbv1.services.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
