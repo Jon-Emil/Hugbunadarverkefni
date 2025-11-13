@@ -1,25 +1,19 @@
 package is.hi.hbv501g.hbv1.extras.entityDTOs.genre;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.game.ReferencedGameDTO;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToMany;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * this is a DTO that is used as the second layer when we provide a user with information about a genre
- * so it includes all info about a genre excluding references to other objects to avoid infinite recursion
- */
-public class ReferencedGenreDTO {
+public class ListedGenreDTO {
     private long id;
     private String title;
     private String description;
     private int gameAmount;
 
-    public ReferencedGenreDTO(Genre genre) {
+    public ListedGenreDTO(Genre genre) {
         this.id = genre.getId();
         this.title = genre.getTitle();
         this.description = genre.getDescription();

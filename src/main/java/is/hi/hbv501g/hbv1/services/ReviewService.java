@@ -11,7 +11,7 @@ public interface ReviewService {
     Review postReview(User user, Game game, ReviewToCreate incomingReviewDTO) throws IllegalArgumentException;
     
     // fixed for implementation and use of ReviewToUpdate DTO
-    void updateReview(User user, Long gameID, Long reviewID, ReviewToUpdate updateReviewDTO)
+    Review updateReview(User user, Long gameID, Long reviewID, ReviewToUpdate updateReviewDTO)
             throws SecurityException, IllegalArgumentException;
     void deleteReview(User user, Long gameID, Long reviewID)
             throws SecurityException, IllegalArgumentException;

@@ -1,12 +1,12 @@
 package is.hi.hbv501g.hbv1.extras.entityDTOs.game;
 
+import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.ReferencedGenreDTO;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
 
-/**
- * this is a DTO that is used as the second layer when we provide a user with information about a game
- * so it includes all info about a game excluding references to other objects to avoid infinite recursion
- */
-public class ReferencedGameDTO {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListedGameDTO {
     private long id;
     private String title;
     private String description;
@@ -15,9 +15,16 @@ public class ReferencedGameDTO {
     private String coverImage;
     private String developer;
     private String publisher;
-    private Float averageRating;
 
-    public ReferencedGameDTO(Game game) {
+    private int reviewAmount;
+    private Float averageRating;
+    private int favoriteAmount;
+    private int wantToPlayAmount;
+    private int havePlayedAmount;
+
+    private List<ReferencedGenreDTO> genres  = new ArrayList<>();
+
+    public ListedGameDTO(Game game) {
         this.id = game.getId();
         this.title = game.getTitle();
         this.description = game.getDescription();
@@ -26,7 +33,14 @@ public class ReferencedGameDTO {
         this.coverImage = game.getCoverImage();
         this.developer = game.getDeveloper();
         this.publisher = game.getPublisher();
+
+        this.genres = game.getGenres().stream()
+                .map(ReferencedGenreDTO::new).toList();
+        this.reviewAmount = game.getReviews().size();
         this.averageRating = game.getAverageRating();
+        this.favoriteAmount = game.getFavoriteOf().size();
+        this.wantToPlayAmount = game.getWantToPlay().size();
+        this.havePlayedAmount = game.getHavePlayed().size();
     }
 
     public long getId() {
@@ -61,5 +75,27 @@ public class ReferencedGameDTO {
         return publisher;
     }
 
-    public Float getAverageRating() { return averageRating; }
+    public List<ReferencedGenreDTO> getGenres() {
+        return genres;
+    }
+
+    public int getReviewAmount() {
+        return reviewAmount;
+    }
+
+    public Float getAverageRating() {
+        return averageRating;
+    }
+
+    public int getFavoriteAmount() {
+        return favoriteAmount;
+    }
+
+    public int getWantToPlayAmount() {
+        return wantToPlayAmount;
+    }
+
+    public int getHavePlayedAmount() {
+        return havePlayedAmount;
+    }
 }

@@ -47,7 +47,7 @@ public class ReviewServiceImplementation implements ReviewService {
     
     @Override
     //changed to accept ReviewToUpdate DTO
-    public void updateReview(User user, Long gameID, Long reviewID, ReviewToUpdate updateReviewDTO)
+    public Review updateReview(User user, Long gameID, Long reviewID, ReviewToUpdate updateReviewDTO)
             throws SecurityException, IllegalArgumentException {
         
         //find the review 
@@ -76,7 +76,7 @@ public class ReviewServiceImplementation implements ReviewService {
             existingReview.setRating(updateReviewDTO.getRating());
         }
 
-        reviewRepository.save(existingReview);
+        return reviewRepository.save(existingReview);
     }
     
     @Override

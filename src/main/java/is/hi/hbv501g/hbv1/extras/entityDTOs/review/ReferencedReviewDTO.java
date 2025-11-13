@@ -20,12 +20,16 @@ public class ReferencedReviewDTO {
     private int rating;
     private String text;
     private String title;
+    private String author;
+    private String gameTitle;
 
     public ReferencedReviewDTO(Review review) {
         this.id = review.getId();
         this.rating = review.getRating();
         this.text = review.getText();
         this.title = review.getTitle();
+        this.author = review.getUser().getUsername();
+        this.gameTitle = review.getGame().getTitle();
     }
 
     public Long getId() {
@@ -42,5 +46,13 @@ public class ReferencedReviewDTO {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getGameTitle() {
+        return gameTitle;
     }
 }
