@@ -44,27 +44,6 @@ public class GameController extends BaseController {
         this.sortHelper = sortHelper;
         this.genreService = genreService;
     }
-
-    /**
-     * Helper function used to easily get the User from the userID stored in the Auth header
-     *
-     * @param authHeader Where the token is stored
-     * @param userNotFoundError What we want the error message to be if we don't find a user matching the userID
-     *
-     * @return User object of the userID that is stored in the header
-     */
-    @Override
-    protected User extractUserFromHeader(String authHeader, String userNotFoundError) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new JwtException("Missing or malformed Authorization header");
-        }
-
-        String token = authHeader.substring(7); // safer than replace()
-        Long userId = jwtHelper.extractUserId(token);
-        User user = userService.findById(userId);
-        if (user == null) throw new JwtException(userNotFoundError);
-        return user;
-    }
     
     /**
      * Handles GET requests on /games
