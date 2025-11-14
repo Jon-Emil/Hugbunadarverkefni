@@ -2,6 +2,7 @@ package is.hi.hbv501g.hbv1.controllers;
 
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.DTOs.*;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.review.ListedReviewDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.review.NormalReviewDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
@@ -43,7 +44,7 @@ public class ReviewController extends BaseController {
 
 
     @RequestMapping(value = "/games/{gameID}/reviews", method= RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalReviewDTO>> seeGamesReviews(
+    public ResponseEntity<BaseResponse<ListedReviewDTO>> seeGamesReviews(
             @PathVariable("gameID") Long gameID,
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
@@ -59,8 +60,8 @@ public class ReviewController extends BaseController {
         List<Review> allReviews = game.getReviews();
         allReviews = sortHelper.sortReviews(allReviews, sortBy, sortReverse);
 
-        List<NormalReviewDTO> allReviewDTOs = allReviews.stream()
-                .map(NormalReviewDTO::new).toList();
+        List<ListedReviewDTO> allReviewDTOs = allReviews.stream()
+                .map(ListedReviewDTO::new).toList();
         return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allReviewDTOs, pageNr,perPage));
     }
 
@@ -119,7 +120,7 @@ public class ReviewController extends BaseController {
      * @return a response entity containing information on how the request went
      */
     @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method=RequestMethod.PATCH)
-    public ResponseEntity<String> updateReview(
+    public ResponseEntity<BaseResponse<NormalReviewDTO>> updateReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @PathVariable Long reviewID,
@@ -128,7 +129,7 @@ public class ReviewController extends BaseController {
     ){        //check for incoming review data
         if (res.hasErrors()){
             String errors = res.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errors);
+            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), errors));
         }
 
         //authenticate the user
@@ -136,18 +137,23 @@ public class ReviewController extends BaseController {
         try{
             user = extractUserFromHeader(authHeader, "must be logged in to change review");
         } catch (JwtException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+        }
+
+        Game game = gameService.findById(gameID);
+        if (game == null) {
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found"));
         }
 
         //then update the review
         try {
             // changed to now accept ReviewToUpdate DTO
-            reviewService.updateReview(user, gameID, reviewID, updateReviewData);
-            return ResponseEntity.ok().body("Review " + reviewID + " update successfully");
+            Review updatedReview = reviewService.updateReview(user, gameID, reviewID, updateReviewData);
+            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Review " + reviewID + " update successfully", new NormalReviewDTO(updatedReview)));
         } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.FORBIDDEN.value(), e.getMessage()));
         } catch (IllegalArgumentException error) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.BAD_REQUEST.value(), error.getMessage()));
         }
     }
 
@@ -162,7 +168,7 @@ public class ReviewController extends BaseController {
      * @return a response entity containing information on how the request went
      */
     @RequestMapping(value = "/games/{gameID}/reviews/{reviewID}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteReview(
+    public ResponseEntity<BaseResponse<Void>> deleteReview(
             @RequestHeader(value = "Authorization") String authHeader,
             @PathVariable Long gameID,
             @PathVariable Long reviewID
@@ -171,18 +177,16 @@ public class ReviewController extends BaseController {
         try {
             user = extractUserFromHeader(authHeader, "You must be logged in to delete a review");
         } catch (JwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
         }
 
         try {
             reviewService.deleteReview(user, gameID, reviewID);
-
-            return ResponseEntity.ok().body("Review " + reviewID + " deleted successfully");
-
+            return wrap(new NormalResponse<>(HttpStatus.OK.value(), "Review " + reviewID + " deleted successfully"));
         } catch (SecurityException e) { //if the user is not the author
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.FORBIDDEN.value(), e.getMessage()));
         } catch (IllegalArgumentException error) { // if the review is not found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
+            return wrap(new NormalResponse<>(HttpStatus.NOT_FOUND.value(), "Game not found"));
         }
     }
 }

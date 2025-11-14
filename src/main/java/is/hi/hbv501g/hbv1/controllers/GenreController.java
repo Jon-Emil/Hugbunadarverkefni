@@ -3,6 +3,7 @@ package is.hi.hbv501g.hbv1.controllers;
 import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.ListedGenreDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.NormalGenreDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.SortHelper;
 import is.hi.hbv501g.hbv1.persistence.entities.Genre;
@@ -33,7 +34,7 @@ public class GenreController extends BaseController {
      * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
      */
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalGenreDTO>> allGenres(
+    public ResponseEntity<BaseResponse<ListedGenreDTO>> allGenres(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
@@ -43,8 +44,8 @@ public class GenreController extends BaseController {
 
         allGenres = sortHelper.sortGenres(allGenres, sortBy, sortReverse);
 
-        List<NormalGenreDTO> allGenresDTOs = allGenres.stream()
-                .map(NormalGenreDTO::new)
+        List<ListedGenreDTO> allGenresDTOs = allGenres.stream()
+                .map(ListedGenreDTO::new)
                 .toList();
 
         return wrap(new PaginatedResponse<>(HttpStatus.OK.value(), allGenresDTOs, pageNr, perPage));

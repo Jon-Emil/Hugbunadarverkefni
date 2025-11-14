@@ -3,6 +3,7 @@ package is.hi.hbv501g.hbv1.controllers;
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.user.ListedUserDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.MyselfUserDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.NormalUserDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.CloudinaryService;
@@ -44,7 +45,7 @@ public class UserController extends BaseController{
      * @return a paginated response showing the status code and the list of genre for the specified page nr aswell as some extra info
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalUserDTO>> allUsers(
+    public ResponseEntity<BaseResponse<ListedUserDTO>> allUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -52,9 +53,9 @@ public class UserController extends BaseController{
     ) {
         List<User> allUsers = userService.findAll();
         allUsers = sortHelper.sortUsers(allUsers, sortBy, sortReverse);
-        List<NormalUserDTO> allGameDTOs = allUsers.stream()
-                .map(NormalUserDTO::new).toList();
-        return wrap(new PaginatedResponse<NormalUserDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
+        List<ListedUserDTO> allGameDTOs = allUsers.stream()
+                .map(ListedUserDTO::new).toList();
+        return wrap(new PaginatedResponse<ListedUserDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
     }
 
     /**
@@ -247,7 +248,7 @@ public class UserController extends BaseController{
      * and a list of all users that match the search.
      */
     @RequestMapping(value = "/users/search", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalUserDTO>> searchUsers(
+    public ResponseEntity<BaseResponse<ListedUserDTO>> searchUsers(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam String username,
@@ -257,8 +258,8 @@ public class UserController extends BaseController{
         List<User> foundUsers = userService.findByUsernameContaining(username);
         foundUsers = sortHelper.sortUsers(foundUsers, sortBy, sortReverse);
 
-        List<NormalUserDTO> displayList = foundUsers.stream()
-                .map(NormalUserDTO::new).toList();
-        return wrap(new PaginatedResponse<NormalUserDTO>(HttpStatus.OK.value(), displayList, pageNr, perPage));
+        List<ListedUserDTO> displayList = foundUsers.stream()
+                .map(ListedUserDTO::new).toList();
+        return wrap(new PaginatedResponse<ListedUserDTO>(HttpStatus.OK.value(), displayList, pageNr, perPage));
     }
 }

@@ -27,67 +27,61 @@ public class HomeController {
                                     "path", "/games",
                                     "method", "GET",
                                     "description", "Displays all games in the system",
-                                    "Tags", "[Sortable], [Paginated]"
+                                    "tags", "[Sortable], [Paginated]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}",
                                     "method", "GET",
                                     "description", "Gets info about the specific game",
-                                    "Tags", "[Dynamic]"
+                                    "tags", "[Dynamic]"
                             ),
                             Map.of(
                                     "path", "/games/search",
                                     "method", "GET",
                                     "description", "Search for games by title, price, release date, developer, publisher, or genres",
-                                    "Tags", "[Sortable], [Paginated], [Extra Parameters]"
-                            ),
-                            Map.of(
-                                    "path", "/games/{gameID}/reviews",
-                                    "method", "POST",
-                                    "description", "Post a new review for a specific game",
-                                    "Tags", "[Dynamic], [Log In Required], [Requires Valid Request Body]"
+                                    "tags", "[Sortable], [Paginated], [Extra Parameters]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}/favorite",
                                     "method", "POST",
                                     "description", "Add a game to the authenticated user’s favorites list",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}/wants",
                                     "method", "POST",
                                     "description", "Add a game to the authenticated user’s 'want to play' list",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}/played",
                                     "method", "POST",
                                     "description", "Add a game to the authenticated user’s 'has played' list",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}/favorite",
                                     "method", "DELETE",
                                     "description", "Remove a game from the authenticated user’s favorites list",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}/wants",
                                     "method", "DELETE",
                                     "description", "Remove a game from the authenticated user’s 'want to play' list",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/games/{gameID}/played",
                                     "method", "DELETE",
                                     "description", "Remove a game from the authenticated user’s 'has played' list",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/games/genre/{genreId}",
                                     "method", "GET",
                                     "description", "Get all games belonging to a specific genre",
-                                    "Tags", "[Sortable], [Paginated], [Dynamic]"
+                                    "tags", "[Sortable], [Paginated], [Dynamic]"
                             )
                     ),
                     "user endpoints", List.of(
@@ -95,49 +89,49 @@ public class HomeController {
                                     "path", "/users",
                                     "method", "GET",
                                     "description", "Displays all users in the system",
-                                    "Tags", "[Sortable], [Paginated]"
+                                    "tags", "[Sortable], [Paginated]"
                             ),
                             Map.of(
                                     "path", "/users",
                                     "method", "DELETE",
                                     "description", "Deletes the account of the authenticated user",
-                                    "Tags", "[Log In Required]"
+                                    "tags", "[Log In Required]"
                             ),
                             Map.of(
                                     "path", "/users",
                                     "method", "PATCH",
                                     "description", "Updates account info of the authenticated user",
-                                    "Tags", "[Log In Required], [Requires Valid Request Body]"
+                                    "tags", "[Log In Required], [Requires Valid Request Body]"
                             ),
                             Map.of(
                                     "path", "/users/{userId}",
                                     "method", "GET",
                                     "description", "Gets the public profile of a specific user",
-                                    "Tags", "[Dynamic]"
+                                    "tags", "[Dynamic]"
                             ),
                             Map.of(
                                     "path", "/users/profile",
                                     "method", "GET",
                                     "description", "Gets the profile of the currently authenticated user",
-                                    "Tags", "[Log In Required]"
+                                    "tags", "[Log In Required]"
                             ),
                             Map.of(
                                     "path", "/users/{userID}/follow",
                                     "method", "POST",
                                     "description", "Follow another user (requires authentication)",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/users/{userID}/follow",
                                     "method", "DELETE",
                                     "description", "Unfollow another user (requires authentication)",
-                                    "Tags", "[Dynamic], [Log In Required]"
+                                    "tags", "[Dynamic], [Log In Required]"
                             ),
                             Map.of(
                                     "path", "/users/search",
                                     "method", "GET",
                                     "description", "Find a user by their username",
-                                    "Tags", "[Sortable], [Paginated], [Extra Parameters]"
+                                    "tags", "[Sortable], [Paginated], [Extra Parameters]"
                             )
                     ),
                     "admin endpoints", List.of(
@@ -145,37 +139,37 @@ public class HomeController {
                                     "path", "/admin/addGame",
                                     "method", "POST",
                                     "description", "Allows an admin to add a new game to the system",
-                                    "Tags", "[Log In Required], [Admin Only], [Requires Valid Request Body]"
+                                    "tags", "[Log In Required], [Admin Only], [Requires Valid Request Body]"
                             ),
                             Map.of(
                                     "path", "/admin/updateGame/{gameID}",
                                     "method", "PATCH",
                                     "description", "Allows an admin to update information about a specific game",
-                                    "Tags", "[Dynamic], [Log In Required], [Admin Only], [Requires Valid Request Body]"
+                                    "tags", "[Dynamic], [Log In Required], [Admin Only], [Requires Valid Request Body]"
                             ),
                             Map.of(
                                     "path", "/admin/deleteGame/{gameID}",
                                     "method", "DELETE",
                                     "description", "Allows an admin to delete a specific game from the system",
-                                    "Tags", "[Dynamic], [Log In Required], [Admin Only]"
+                                    "tags", "[Dynamic], [Log In Required], [Admin Only]"
                             ),
                             Map.of(
                                     "path", "/admin/addGenre",
                                     "method", "POST",
                                     "description", "Allows an admin to add a new genre to the system",
-                                    "Tags", "[Log In Required], [Admin Only], [Requires Valid Request Body]"
+                                    "tags", "[Log In Required], [Admin Only], [Requires Valid Request Body]"
                             ),
                             Map.of(
                                     "path", "/admin/deleteGenre/{genreID}",
                                     "method", "DELETE",
                                     "description", "Allows an admin to delete a specific genre from the system",
-                                    "Tags", "[Dynamic], [Log In Required], [Admin Only]"
+                                    "tags", "[Dynamic], [Log In Required], [Admin Only]"
                             ),
                             Map.of(
                                     "path", "/admin/deleteUser/{userID}",
                                     "method", "DELETE",
                                     "description", "Allows an admin to delete a specific user account from the system",
-                                    "Tags", "[Dynamic], [Log In Required], [Admin Only]"
+                                    "tags", "[Dynamic], [Log In Required], [Admin Only]"
                             )
                     ),
                     "authentication endpoints", List.of(
@@ -183,13 +177,13 @@ public class HomeController {
                                     "path", "/login",
                                     "method", "POST",
                                     "description", "Allows the user to log in to an existing account",
-                                    "Tags", "[Requires Valid Request Body]"
+                                    "tags", "[Requires Valid Request Body]"
                             ),
                             Map.of(
                                     "path", "/register",
                                     "method", "POST",
                                     "description", "Allows the user to register a new account",
-                                    "Tags", "[Requires Valid Request Body]"
+                                    "tags", "[Requires Valid Request Body]"
                             )
                     ),
                     "genre endpoints", List.of(
@@ -197,7 +191,39 @@ public class HomeController {
                                     "path", "/genres",
                                     "method", "GET",
                                     "description", "Allows the user to see all existing genres in the system",
-                                    "Tags", "[Sortable], [Paginated]"
+                                    "tags", "[Sortable], [Paginated]"
+                            ),
+                            Map.of(
+                                    "path", "/genres/{genreID}",
+                                    "method", "GET",
+                                    "description", "Allows the user to see info about a specific genre",
+                                    "tags", "[Dynamic]"
+                            )
+                    ),
+                    "review endpoints", List.of(
+                            Map.of(
+                                    "path", "/games/{gameID}/reviews",
+                                    "method", "GET",
+                                    "description", "Allows the user to see all reviews of a game in the system",
+                                    "tags", "[Sortable], [Paginated]"
+                            ),
+                            Map.of(
+                                    "path", "/games/{gameID}/reviews",
+                                    "method", "POST",
+                                    "description", "Post a new review for a specific game",
+                                    "tags", "[Dynamic], [Log In Required], [Requires Valid Request Body]"
+                            ),
+                            Map.of(
+                                    "path", "games/{gameID}/reviews/{reviewID}",
+                                    "method", "PATCH",
+                                    "description", "Patch a review that already exists",
+                                    "tags", "[Dynamic], [Log In Required], [Requires Valid Request Body]"
+                            ),
+                            Map.of(
+                                "path", "games/{gameID}/reviews/{reviewID}",
+                                "method", "DELETE",
+                                "description", "deletes an existing review",
+                                "tags", "[Dynamic], [Log In Required], [Requires Valid Request Body]"
                             )
                     )
                 )

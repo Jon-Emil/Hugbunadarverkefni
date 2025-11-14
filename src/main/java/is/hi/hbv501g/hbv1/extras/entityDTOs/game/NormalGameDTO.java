@@ -1,13 +1,9 @@
 package is.hi.hbv501g.hbv1.extras.entityDTOs.game;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.genre.ReferencedGenreDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.review.ReferencedReviewDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.user.ReferencedUserDTO;
 import is.hi.hbv501g.hbv1.persistence.entities.Game;
-import is.hi.hbv501g.hbv1.persistence.entities.Genre;
-import is.hi.hbv501g.hbv1.persistence.entities.Review;
-import is.hi.hbv501g.hbv1.persistence.entities.User;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -27,6 +23,7 @@ public class NormalGameDTO {
     private String coverImage;
     private String developer;
     private String publisher;
+    private Float averageRating;
 
     private List<ReferencedGenreDTO> genres  = new ArrayList<>();
     private List<ReferencedReviewDTO> reviews = new ArrayList<>();
@@ -43,6 +40,7 @@ public class NormalGameDTO {
         this.coverImage = game.getCoverImage();
         this.developer = game.getDeveloper();
         this.publisher = game.getPublisher();
+        this.averageRating = game.getAverageRating();
 
         this.genres = game.getGenres().stream()
                 .map(ReferencedGenreDTO::new).toList();
@@ -107,4 +105,6 @@ public class NormalGameDTO {
     public List<ReferencedUserDTO> getHavePlayed() {
         return havePlayed;
     }
+
+    public Float getAverageRating() { return averageRating; }
 }

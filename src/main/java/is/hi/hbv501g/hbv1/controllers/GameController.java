@@ -3,6 +3,7 @@ package is.hi.hbv501g.hbv1.controllers;
 import io.jsonwebtoken.JwtException;
 import is.hi.hbv501g.hbv1.extras.DTOs.BaseResponse;
 import is.hi.hbv501g.hbv1.extras.DTOs.NormalResponse;
+import is.hi.hbv501g.hbv1.extras.entityDTOs.game.ListedGameDTO;
 import is.hi.hbv501g.hbv1.extras.entityDTOs.game.NormalGameDTO;
 import is.hi.hbv501g.hbv1.extras.helpers.JWTHelper;
 import is.hi.hbv501g.hbv1.extras.DTOs.PaginatedResponse;
@@ -43,27 +44,6 @@ public class GameController extends BaseController {
         this.sortHelper = sortHelper;
         this.genreService = genreService;
     }
-
-    /**
-     * Helper function used to easily get the User from the userID stored in the Auth header
-     *
-     * @param authHeader Where the token is stored
-     * @param userNotFoundError What we want the error message to be if we don't find a user matching the userID
-     *
-     * @return User object of the userID that is stored in the header
-     */
-    @Override
-    protected User extractUserFromHeader(String authHeader, String userNotFoundError) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new JwtException("Missing or malformed Authorization header");
-        }
-
-        String token = authHeader.substring(7); // safer than replace()
-        Long userId = jwtHelper.extractUserId(token);
-        User user = userService.findById(userId);
-        if (user == null) throw new JwtException(userNotFoundError);
-        return user;
-    }
     
     /**
      * Handles GET requests on /games
@@ -75,7 +55,7 @@ public class GameController extends BaseController {
      * and all available games sorted by their title alphabetically of the page requested
      */
     @RequestMapping(value = "/games", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalGameDTO>> allGames(
+    public ResponseEntity<BaseResponse<ListedGameDTO>> allGames(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(defaultValue = "title") String sortBy,
@@ -88,9 +68,9 @@ public class GameController extends BaseController {
         allGames = sortHelper.sortGames(allGames, sortBy, sortReverse);
 
         // convert to DTOs
-        List<NormalGameDTO> allGameDTOs = allGames.stream()
-                .map(NormalGameDTO::new).toList();
-        return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr,perPage));
+        List<ListedGameDTO> allGameDTOs = allGames.stream()
+                .map(ListedGameDTO::new).toList();
+        return wrap(new PaginatedResponse<ListedGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr,perPage));
     }
 
     @RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET)
@@ -119,7 +99,7 @@ public class GameController extends BaseController {
      * and all available games that fit the criteria in the page that was requested
      */
     @RequestMapping(value = "/games/search", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalGameDTO>> gameSearch(
+    public ResponseEntity<BaseResponse<ListedGameDTO>> gameSearch(
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
             @RequestParam(required = false) String title,
@@ -138,9 +118,9 @@ public class GameController extends BaseController {
         );
         List<Game> foundGames = gameService.search(params);
         foundGames = sortHelper.sortGames(foundGames, sortBy, sortReverse);
-        List<NormalGameDTO> allGameDTOs = foundGames.stream()
-                .map(NormalGameDTO::new).toList();
-        return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
+        List<ListedGameDTO> allGameDTOs = foundGames.stream()
+                .map(ListedGameDTO::new).toList();
+        return wrap(new PaginatedResponse<ListedGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
     }
 
     /**
@@ -348,7 +328,7 @@ public class GameController extends BaseController {
     }
 
     @RequestMapping(value = "/games/genre/{genreId}", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse<NormalGameDTO>> listGamesByGenreId(
+    public ResponseEntity<BaseResponse<ListedGameDTO>> listGamesByGenreId(
             @PathVariable("genreId") Long genreId,
             @RequestParam(defaultValue = "1") int pageNr,
             @RequestParam(defaultValue = "10") int perPage,
@@ -367,8 +347,8 @@ public class GameController extends BaseController {
 
         allGames = sortHelper.sortGames(allGames, sortBy, sortReverse);
 
-        List<NormalGameDTO> allGameDTOs = allGames.stream()
-                .map(NormalGameDTO::new).toList();
-        return wrap(new PaginatedResponse<NormalGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
+        List<ListedGameDTO> allGameDTOs = allGames.stream()
+                .map(ListedGameDTO::new).toList();
+        return wrap(new PaginatedResponse<ListedGameDTO>(HttpStatus.OK.value(), allGameDTOs, pageNr, perPage));
     }
 }
