@@ -25,8 +25,6 @@ import java.util.List;
 @RestController
 public class GameController extends BaseController {
     private final GameService gameService;
-    private final UserService userService;
-    private final JWTHelper jwtHelper;
     private final SortHelper sortHelper;
     private final GenreService genreService;
 
@@ -44,7 +42,7 @@ public class GameController extends BaseController {
         this.sortHelper = sortHelper;
         this.genreService = genreService;
     }
-    
+
     /**
      * Handles GET requests on /games
      *
